@@ -1,0 +1,1528 @@
+import colorsys
+import copy
+import hashlib
+import json
+import math
+import os
+import sys
+import uuid
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
+from PIL import Image, ImageTk, ImageDraw
+
+# =========================================================
+#  PALETTE  (Dragon-Adventures-ish purple theme)
+# =========================================================
+
+PALETTE = {
+    "bg_outer":      "#5C4A93",
+    "panel_fill":    "#473B72",
+    "panel_border":  "#8874C9",
+    "tag_fill":      "#2E2550",
+    "badge_fill":    "#F2A93B",
+    "badge_border":  "#8B5A2B",
+    "title_fill":    "#FFA63D",
+    "title_outline": "#B85C00",
+    "label_text":    "#C9B8F0",
+    "bar_track":     "#2B3D22",
+    "bar_fill":      "#7ED957",
+    "bar_border":    "#3C7A2E",
+    "swatch_bg":     "#F4F4F4",
+    "card_fill":     "#5A4A8E",
+    "card_border":   "#8874C9",
+    "row_fill":      "#3A2F5C",
+    "row_border":    "#2B2148",
+    "header_band":        "#8B6F47",
+    "header_band_border": "#5C4A30",
+    "value_text":    "#FFFFFF",
+    "value_outline": "#2B2148",
+    "pill_text":     "#3FA9E0",
+    "pill_outline":  "#173145",
+}
+
+RARITY_COLORS = {
+    "Common":    "#A0A0A0",
+    "Uncommon":  "#55FF88",
+    "Rare":      "#4DA3FF",
+    "Epic":      "#B84DFF",
+    "Legendary": "#FFB300",
+    "Relic":     "#B2560D",
+}
+RARITY_LIST = list(RARITY_COLORS.keys())
+RARITY_DEFAULT_COLOR = "#9499F7"  # used for any rarity text you type that isn't above
+
+# Accounts are stored dynamically (see all_accounts_data below) — these are
+# only the placeholder names used while building the app, removed automatically.
+LEGACY_EXAMPLE_ACCOUNTS = {"tamaraa123", "DragonTamerSuu", "WobblyPengu"}
+
+# =========================================================
+#  GAME DATA  (generated from your list -- one spot to add more)
+# =========================================================
+
+COLOR_HEX_MAP = {
+    'White': '#FFFFFF',
+    'Snowflake': '#F7F9F9',
+    'Whisp': '#EAEDEF',
+    'Whale': '#D0CFD7',
+    'Mist': '#C3C8CD',
+    'Storm': '#A1ABB3',
+    'Silver': '#AFAFAF',
+    'Gravel': '#888F8D',
+    'Felt': '#9C8E8D',
+    'Bluesteel': '#6A7185',
+    'Stone': '#636268',
+    'Tin': '#5A6050',
+    'Spirit': '#545365',
+    'Gloom': '#595451',
+    'Coal': '#4C4C4C',
+    'Gabbro': '#4D484F',
+    'Asphalt': '#413C40',
+    'Ash': '#3B3736',
+    'Basalt': '#332D25',
+    'Scoria': '#302722',
+    'Boulder': '#26262C',
+    'Black': '#1A1A1B',
+    'Pitch': '#0E1011',
+    'Night': '#1F1A23',
+    'Depth': '#22263D',
+    'Blackberry': '#471A43',
+    'Berry': '#4C2A4F',
+    'Loulou': '#553348',
+    'Lilac': '#6E235D',
+    'Amarklor': '#551199',
+    'Grape': '#863290',
+    'Petal': '#9778BE',
+    'Satin': '#7F6195',
+    'Haunted': '#5C415D',
+    'Ghost': '#735B77',
+    'Lavender': '#8E7F9E',
+    'Amethyst': '#A794B2',
+    'Dart': '#AA96A6',
+    'Pansy': '#E1CDFE',
+    'Bubble': '#CCA4E0',
+    'Plum': '#DA4FFF',
+    'Purple': '#9C50D3',
+    'Royal': '#7958B1',
+    'Eggplant': '#993BD1',
+    'Midnight': '#7930B5',
+    'Urchin': '#5317B5',
+    'Jelly': '#4D2C89',
+    'Smog': '#3F2B66',
+    'Sapphire': '#0D0A5B',
+    'Angler': '#2B0D88',
+    'Bluebell': '#2D237A',
+    'Aster': '#484AA1',
+    'Smoke': '#525195',
+    'Uranus': '#4866D5',
+    'Rain': '#757ADB',
+    'Periwinkle': '#9499F7',
+    'Stream': '#7895C1',
+    'Aegean': '#4E6EA0',
+    'Harpy': '#444F69',
+    'Blue': '#324BA9',
+    'Denim': '#212B5F',
+    'Morpho': '#023489',
+    'Raindrop': '#023AE2',
+    'Marine': '#1C51E7',
+    'Ocean': '#2F83FF',
+    'Drip': '#6394DD',
+    'Cool': '#76A8FF',
+    'Sky': '#AEC8FF',
+    'Cloud': '#89A4C0',
+    'Aluminum': '#556979',
+    'Iron': '#2F4557',
+    'Dream': '#263746',
+    'Abyss': '#0D1E25',
+    'Trench': '#0B2D46',
+    'Twilight': '#0A3D67',
+    'Mountain': '#094869',
+    'Azure': '#2B768F',
+    'Shell': '#0086CE',
+    'Cerulean': '#00B4D5',
+    'Icecap': '#9CDDD3',
+    'Winter': '#B3E1F1',
+    'Glacier': '#E0FFFF',
+    'Glow': '#91FFF7',
+    'Cyan': '#00FFF1',
+    'Bermuda': '#77DDDA',
+    'Lagoon': '#09E0C7',
+    'Plankton': '#18D3A9',
+    'Turquoise': '#3CA2A4',
+    'History': '#3A8684',
+    'Spruce': '#8DBCB4',
+    'Water': '#72C4C4',
+    'Glass': '#9AEAEF',
+    'Pistachio': '#E2FFE6',
+    'Dolphin': '#B3FFD8',
+    'Mint': '#9AFFC7',
+    'Seafoam': '#B2E2BD',
+    'Caterpillar': '#A6DBA7',
+    'Jade': '#61AB89',
+    'Spearmint': '#148E67',
+    'Essence': '#1F565D',
+    'Rainforest': '#233253',
+    'Seaweed': '#153F4B',
+    'Algae': '#114D41',
+    'Forest': '#1F483A',
+    'Hydra': '#005D48',
+    'Emerald': '#20603F',
+    'Shamrock': '#236825',
+    'Pear': '#66903C',
+    'Jungle': '#1E361A',
+    'Swamp': '#1E2716',
+    'Root': '#1F281D',
+    'Moonrock': '#495547',
+    'Snake': '#425035',
+    'Camo': '#51684C',
+    'Prismarine': '#4D6A6E',
+    'Scale': '#516760',
+    'Ivy': '#687F67',
+    'Mantis': '#97AF8B',
+    'Micah': '#A7B08C',
+    'Pea': '#9BFF9D',
+    'Synthesizer': '#03FF7D',
+    'Malachite': '#87E34D',
+    'Fern': '#7ECE73',
+    'Stem': '#7BBD5D',
+    'Green': '#629C3F',
+    'Grass': '#567C34',
+    'Clover': '#3ABB3B',
+    'Cactus': '#8ECE56',
+    'Leaf': '#A5E32D',
+    'Toxin': '#C6FF00',
+    'Uranium': '#CDFE6C',
+    'Corrosion': '#9FFF00',
+    'Peridot': '#E8FCB4',
+    'Cabbage': '#D1E572',
+    'Chartreuse': '#B4CD3D',
+    'Prehistoric': '#A9A032',
+    'Alligator': '#828335',
+    'Olive': '#697135',
+    'Murk': '#4B4420',
+    'Bark': '#7E7645',
+    'Amber': '#C18E1B',
+    'Sponge': '#BEA55D',
+    'Haze': '#D1B045',
+    'Swallowtail': '#D1B300',
+    'Lemon': '#FFE63B',
+    'Wasp': '#F9E255',
+    'Yolk': '#F7FF6F',
+    'Banana': '#FFEC80',
+    'Honey': '#FDD68B',
+    'Squash': '#FDE9AC',
+    'Sanddollar': '#EDE8B0',
+    'Mellow': '#FFFDEA',
+    'Lychee': '#FDF1E1',
+    'Creme': '#FFEFDC',
+    'Pelt': '#F7DEBF',
+    'Ivory': '#FFD297',
+    'Peanut': '#F6BF6C',
+    'Gold': '#F2AD0C',
+    'Marigold': '#FFB53C',
+    'Apricot': '#FA912B',
+    'Poppy': '#FF8500',
+    'Yam': '#FF984F',
+    'Orange': '#FFA147',
+    'Peach': '#FFB576',
+    'Silt': '#FCC4AD',
+    'Sahara': '#F0B392',
+    'Pecan': '#E29C7A',
+    'Saffron': '#D5602B',
+    'Chestnut': '#CB732D',
+    'Bronze': '#B2560D',
+    'Sandstone': '#B24407',
+    'Carrot': '#FF5500',
+    'Fire': '#EF5C23',
+    'Pumpkin': '#FF6841',
+    'Sunrise': '#FF7360',
+    'Cinnamon': '#C15A39',
+    'Caramel': '#C47149',
+    'Acorn': '#B27749',
+    'Tortilla': '#9A7B4F',
+    'Hide': '#C3996F',
+    'Beige': '#CABBA2',
+    'Pine': '#827A64',
+    'Soil': '#6D675B',
+    'Coffee': '#564D48',
+    'Cocoa': '#3C3030',
+    'Chocolate': '#766259',
+    'Cappuccino': '#977B6C',
+    'Beach': '#BFA18F',
+    'Gingerbread': '#8A6059',
+    'Maple': '#7A4D4D',
+    'Hazel': '#774840',
+    'Coconut': '#6B3C34',
+    'Clay': '#603E3D',
+    'Sable': '#57372C',
+    'Penny': '#432711',
+    'Umber': '#301E1A',
+    'Brownie': '#22110A',
+    'Birch': '#2F1B1B',
+    'Feldspar': '#5A4534',
+    'Walnut': '#72573A',
+    'Grain': '#855B33',
+    'Ginger': '#91532A',
+    'Starfish': '#90553A',
+    'Brown': '#8E5B3F',
+    'Slate': '#563012',
+    'Auburn': '#7B3C1D',
+    'Copper': '#A44B28',
+    'Rust': '#8B3220',
+    'Tomato': '#BA311C',
+    'Vermillion': '#E22D18',
+    'Pepper': '#CE000D',
+    'Cherry': '#AA0024',
+    'Crimson': '#850012',
+    'Ruby': '#7A0E1E',
+    'Garnet': '#581014',
+    'Sanguine': '#2D0102',
+    'Blood': '#451717',
+    'Rose': '#652127',
+    'Cranberry': '#8C272D',
+    'Redwood': '#C1272D',
+    'Strawberry': '#DF3236',
+    'Fruit': '#FC6D68',
+    'Carmine': '#B13A3A',
+    'Cerise': '#A12928',
+    'Brick': '#9A534D',
+    'Coral': '#CC6F6F',
+    'Blush': '#FEA0A0',
+    'Macaron': '#FFE2E6',
+    'Sakura': '#FFB7B4',
+    'Flamingo': '#FEA1B3',
+    'Peony': '#FFE5E5',
+    'Dust': '#EBE0DF',
+    'Ribbon': '#FF839B',
+    'Charm': '#C67A80',
+    'Taffy': '#D696B6',
+    'Candy': '#EB799A',
+    'Bubblegum': '#FB5E79',
+    'Watermelon': '#DB518D',
+    'Magenta': '#E934AA',
+    'Fuschia': '#E7008B',
+    'Tulip': '#CB0381',
+    'Razzmatazz': '#ED2061',
+    'Rubellite': '#AA004C',
+    'Raspberry': '#8A024A',
+    'Syrah': '#4D0F28',
+    'Mauve': '#9C4975',
+    'Radish': '#C44674',
+    'Gum': '#E77FBF',
+    'Quartz': '#E5A9FF',
+    'Confetti': '#E8CCFF',
+    'Petalite': '#FFD6F6',
+    'Pearl': '#FBEDFA',
+    'Legendary': '#FFD700',
+    'Error: 2F1B1C': '#2F1B1C',
+    'Error: 211919': '#211919',
+    'Error: 28292B': '#28292B',
+    'Error: 8C272F': '#8C272F',
+    'Error: 7A87A1': '#7A87A1',
+    'Error: 567C3F': '#567C3F',
+    'Error: 013485': '#013485',
+    'Error: 0F0A09': '#0F0A09',
+    'Error: AB5D29': '#AB5D29',
+    'Error: 134805': '#134805',
+}
+
+COLOR_LIST = [
+    'White', 'Snowflake', 'Whisp', 'Whale', 'Mist', 'Storm', 'Silver', 'Gravel', 'Felt', 
+    'Bluesteel', 'Stone', 'Tin', 'Spirit', 'Gloom', 'Coal', 'Gabbro', 'Asphalt', 'Ash', 'Basalt', 
+    'Scoria', 'Boulder', 'Black', 'Pitch', 'Night', 'Depth', 'Blackberry', 'Berry', 'Loulou', 
+    'Lilac', 'Amarklor', 'Grape', 'Petal', 'Satin', 'Haunted', 'Ghost', 'Lavender', 'Amethyst', 
+    'Dart', 'Pansy', 'Bubble', 'Plum', 'Purple', 'Royal', 'Eggplant', 'Midnight', 'Urchin', 
+    'Jelly', 'Smog', 'Sapphire', 'Angler', 'Bluebell', 'Aster', 'Smoke', 'Uranus', 'Rain', 
+    'Periwinkle', 'Stream', 'Aegean', 'Harpy', 'Blue', 'Denim', 'Morpho', 'Raindrop', 'Marine', 
+    'Ocean', 'Drip', 'Cool', 'Sky', 'Cloud', 'Aluminum', 'Iron', 'Dream', 'Abyss', 'Trench', 
+    'Twilight', 'Mountain', 'Azure', 'Shell', 'Cerulean', 'Icecap', 'Winter', 'Glacier', 'Glow', 
+    'Cyan', 'Bermuda', 'Lagoon', 'Plankton', 'Turquoise', 'History', 'Spruce', 'Water', 'Glass', 
+    'Pistachio', 'Dolphin', 'Mint', 'Seafoam', 'Caterpillar', 'Jade', 'Spearmint', 'Essence', 
+    'Rainforest', 'Seaweed', 'Algae', 'Forest', 'Hydra', 'Emerald', 'Shamrock', 'Pear', 'Jungle', 
+    'Swamp', 'Root', 'Moonrock', 'Snake', 'Camo', 'Prismarine', 'Scale', 'Ivy', 'Mantis', 'Micah', 
+    'Pea', 'Synthesizer', 'Malachite', 'Fern', 'Stem', 'Green', 'Grass', 'Clover', 'Cactus', 
+    'Leaf', 'Toxin', 'Uranium', 'Corrosion', 'Peridot', 'Cabbage', 'Chartreuse', 'Prehistoric', 
+    'Alligator', 'Olive', 'Murk', 'Bark', 'Amber', 'Sponge', 'Haze', 'Swallowtail', 'Lemon', 
+    'Wasp', 'Yolk', 'Banana', 'Honey', 'Squash', 'Sanddollar', 'Mellow', 'Lychee', 'Creme', 
+    'Pelt', 'Ivory', 'Peanut', 'Gold', 'Marigold', 'Apricot', 'Poppy', 'Yam', 'Orange', 'Peach', 
+    'Silt', 'Sahara', 'Pecan', 'Saffron', 'Chestnut', 'Bronze', 'Sandstone', 'Carrot', 'Fire', 
+    'Pumpkin', 'Sunrise', 'Cinnamon', 'Caramel', 'Acorn', 'Tortilla', 'Hide', 'Beige', 'Pine', 
+    'Soil', 'Coffee', 'Cocoa', 'Chocolate', 'Cappuccino', 'Beach', 'Gingerbread', 'Maple', 
+    'Hazel', 'Coconut', 'Clay', 'Sable', 'Penny', 'Umber', 'Brownie', 'Birch', 'Feldspar', 
+    'Walnut', 'Grain', 'Ginger', 'Starfish', 'Brown', 'Slate', 'Auburn', 'Copper', 'Rust', 
+    'Tomato', 'Vermillion', 'Pepper', 'Cherry', 'Crimson', 'Ruby', 'Garnet', 'Sanguine', 'Blood', 
+    'Rose', 'Cranberry', 'Redwood', 'Strawberry', 'Fruit', 'Carmine', 'Cerise', 'Brick', 'Coral', 
+    'Blush', 'Macaron', 'Sakura', 'Flamingo', 'Peony', 'Dust', 'Ribbon', 'Charm', 'Taffy', 
+    'Candy', 'Bubblegum', 'Watermelon', 'Magenta', 'Fuschia', 'Tulip', 'Razzmatazz', 'Rubellite', 
+    'Raspberry', 'Syrah', 'Mauve', 'Radish', 'Gum', 'Quartz', 'Confetti', 'Petalite', 'Pearl', 
+    'Legendary', 'Error: 2F1B1C', 'Error: 211919', 'Error: 28292B', 'Error: 8C272F', 
+    'Error: 7A87A1', 'Error: 567C3F', 'Error: 013485', 'Error: 0F0A09', 'Error: AB5D29', 
+    'Error: 134805', 
+]
+
+MATERIAL_LIST = [
+    'Asphalt', 'Basalt', 'Big Scales', 'Circuitry', 'Clean Metal', 'Clovers', 'Cobblestone', 
+    'Concrete', 'Cracked Lava', 'Cracked Rock', 'Cursed', 'Diamonds', 'Fish Scales', 'Foil', 
+    'Force Field', 'Fur Tufts', 'Gator Leather', 'Gemstone', 'Glacier', 'Glass', 'Granite', 
+    'Grass', 'Hearts', 'Honeycomb', 'Ice', 'Limestone', 'Marble', 'Metal', 'Mud', 'Neon', 
+    'Pasture', 'Patches', 'Pebble', 'Plagued', 'Pumpkin', 'Quilt', 'Rounded Scales', 'Salt', 
+    'Sand', 'Sandstone', 'Scales', 'Scute', 'Serpentine', 'Sharp Scales', 'Slate', 
+    'Smooth Plastic', 'Snow', 'Snowflakes', 'Star Paper', 'Static', 'Terrascale', 'Thick Fur', 
+    'Thin Fur', 'Tough Leather', 'Velvet', 'Wall Paper', 'Wavy Fur', 'Weeds', 'Wood', 
+    'Wood Planks', 'Worn Leather', 'Wrapping Paper', 
+]
+
+ELEMENT_LIST = [
+    'Fire', 'Grass', 'Water', 'Bone', 'Fear', 'Ghost', 'Nightmare', 'Pumpkin Spice', 'Scythe', 
+    'Vampire', 'Witch Brew', 'Ashfall', 'Bubble', 'Chitin', 'Chocolate Strawberry', 'Confetti', 
+    'Deep Sea', 'Fireworks', 'Lightning', 'Maple', 'Nightshade', 'Aurora Borealis', 'Obsidian', 
+    'Orbit', 'Peppermint', 'Poison Field', 'Seashell', 'Storm', 'Time', 'Vivid Bloom', 'Zephyr', 
+    'Battle', 'Biohazard', 'Campfire Tales', 'Cat Toys', 'Coded Void', 'Cotton', 'Debug', 
+    'Deepwood', 'Dragonseer', 'Dream', 'Explorer', 'Film Star', 'Inferno', 'Magister', 'Melody', 
+    'Moonward', 'Ouroborus', 'Paint', 'Pixie', 'Runic Waters', 'Soul Flame', 'Stygian', 
+    'Sunswept Sea', 'Superheated', 'Targeting System', 'Treasurefire', 'Tungsten', 'Verdant', 
+    'War Cry', 'Warrior', 'Christmas', 'Frostbite', 'Holly Berry', 'Icicle', 'Pan Dulce', 
+    'Ribbon', 'Shooting Star', 'Snowflake', 'Starlight', 'Subzero', 'Auspicious Clouds', 
+    'Golden Coin', 'Chocolate', 'Love', 'Obsession', 'Prickly Rose', 'Sugar', 'Carrot', 
+    'Dandelion', 'Egged', 'Eternal', 'Floral', 'Jelly Bean', 'Honey', 'Moss', 'Sakura', 
+    'Thorned Apple', 'Binary', 'Celestial', 'Mining Drill', 'Laser', 'Malware', 'Metal', 'Plasma', 
+    'Pulsar', 'Virus', 'Eclipse', 'Gamma Ray', 'Gold', 'Lunaris', 'Messier', 'Solar Winds', 
+    'Classic', 'Diamond', 'Clover', 'Lucky Gold', 'Opulent', 'Rainbow', 'Relic', 'Tempest', 'Air', 
+    'Lava', 'Ocean', 'Dark', 'Ice', 'Light', 'Toxic', 'Abyss', 'Angel', 'Bluefire', 'Demon', 
+    'Moon', 'Sun', 'Antimatter', 'Corrosive', 'Death', 'Equinox', 'Life', 'Wraith', 
+]
+
+SPECIES_LIST = [
+    'Aeroseys', 'Aethereus', 'Agricos', 'Alatura', 'Allpehourn', 'Alrenoth', 'Amoonita', 
+    'Amphyll', 'Ancient Aranga', 'Ancient Skriffei', 'Ancient Tosknir', 'Andronaut', 'Araneaix', 
+    'Aranga', 'Arielisces', 'Astraeisis', 'Atarix', 'Atravanta', 'Aurutentia', 'Avarakuma', 
+    'Avefir', 'Ayatrice', 'Balgunyur', 'Betevial', 'Bisonture', 'Bizaltidath', 'Bylendarach', 
+    'Caelydris', 'Calimaki', 'Carnealgon', 'Casirius', 'Catruca', 'Caudembris', 'Caunaris', 
+    'Chameleaf', 'Chippychiip', 'Chronocus', 'Chrysaloom', 'Cirquemaar', 'Cocovira', 
+    'Cogitergosyn', 'Constello', 'Coralina', 'Corrupted Chronocus', 'Cosmalisk', 'Cryptillow', 
+    'Cutiepatoo', 'Cybernid', 'Cynphion-Noire', 'Desygual', 'Dexyn', 'Diraixos', 'Djaevelhest', 
+    'Dratheros', 'Dunvolth', 'Dysuva', 'Eisendrache', 'Enkylous', 'Eryndiorn', 'Eteralix', 
+    'Fabledrak', 'Falugeis', 'Fayrah', 'Featherfang', 'Fernifex', 'Ferorex', 'Firifeller', 
+    'Fleurianthus', 'Flornymphis', 'Fueguin', 'Fulong', 'Gaulyra', 'Geliklen', 'Geoteryx', 
+    'Glacegar', 'Glaquacus', 'Goelica', 'Goliatomb', 'Gordigourd', 'Guilmoros', 'Gundrakken', 
+    'Gyngefared', 'Gyrocopter', 'Harvitius', 'Hexalios', 'Hielochiim', 'Hoarusn', 'Hongliang', 
+    'Howler', 'Ignicaris', 'Impiavolo', 'Iridesia', 'Karukiri', 'Khalknirik', 'Khepera', 
+    'Khorgeryn', 'Kikien', 'Kostragula', 'Krekiz', 'Ladonix', 'Lepilon', 'Livalient', 'Lucklif', 
+    'Lum Luenh', 'Lumenigh', 'Lunaesol', 'Lyria', 'Magmip', 'Makoura', 'Mallopii', 'Malupentys', 
+    'Mechanoxide', 'Mielebee', 'Mistrasune', 'Moixaura', 'Mosuraki', 'Mother Dragon', 'Motorouk', 
+    'Mountain Dragon', 'Nadaler', 'Nakahii', 'Neroxide', 'Nightmare Paranox', 'Noctorius', 
+    "Nor'gan", 'Numine', 'Nyxavoid', 'Onagajin', 'Oroalas', 'Ortarouk', 'Ovicirus', 'Pagulau', 
+    'Paladianos', 'Palus', 'Pananisea', 'Paranox', 'Paukiki', 'Penguitus', 'Phocaphan', 
+    'Phyllantis', 'Polairistel', 'Putrefacceum', 'Quahtona', 'Quasaldrus', 'Quetzaloctli', 
+    'Radidon', 'Raikami', 'Rhyndac', 'Riyu', 'Robodon', 'Roborus V', 'Roborus X', 'Rocirus', 
+    'Rozora', 'Saurium', 'Scrawei', 'Seikarin', 'Sentalius', 'Silvestratus', 'Skelltor', 
+    'Skriffei', 'Skyrix', 'Smokgien', 'Snoballista', 'Solarizon', 'Soukeyi', 
+    'Source Dragon of Energy', 'Source Dragon of Motion', 'Stellaris', 'Stratalix', 'Stymelisk', 
+    'Suiikipon', 'Sunfloris', 'Syliru', 'Sylva', 'Taihoa', 'Taligris', 'Taraka', 'Tarotta', 
+    'Tempiritus', 'Tenebis', 'Terruak', 'Thorkonyx', 'Tianma', 'Tigrilia', 'Tlalocun', 
+    'Torneidus', 'Tosknir', 'Trametos', 'Trilinaris', 'Tronat', 'Tsukuizan', 'Tuskaryn', 
+    'Uheailes', 'Valkiero', 'Varana', 'Veidreki', 'Venid', 'Venu', 'Verdrakor', 'Verscervus', 
+    'Viridik', 'Volkumos', 'Voltagen', 'Voltstorm', 'Vulcoramor', 'Vulpiruth', 'Vyreas', 
+    'Woodluma', 'Wuonghou', 'Xellatruce', 'Xerthos', 'Yaruakura', 'Yggdraten', 'Yueshi', 
+    'Yulereinn', 'Zeipera', 'Zinthros', 
+]
+
+PUPIL_LIST = [
+    'Round', 'Slit', 'Empty', 'Square', 'Sparkle', 'Star', 'Confused', 'Legendary', 
+]
+
+COSMETIC_TRAIT_LIST = [
+    'None', 'Albinism', 'Melanism', 'Platinum', 'Shadow', 'Electric', 'Electric Head', 
+    'Electric Tail', 'Inflamed', 'Inflamed Head', 'Inflamed Tail', 'Aura', 'Head Aura', 
+    'Tail Aura', 'Wild Eye Aura', 'Storm Surge', 'Ring of Fire', 'Seashell', 'Clover', 
+    'Enchanted Meadows', 'Noxious', 'Poison', '[Error:Cosmetic]', 'Bat Swarm', 'Black Hole', 
+    'Blizzard', 'Blooming Aura', 'Blossoming Aura', 'Blossoming Head Aura', 
+    'Blossoming Tail Aura', 'Bloxfest 2026 Shimmer', 'Celestial Blaze', 'Chaos Aura', 'Chilly', 
+    'Christmas Lights', 'Crystallized', 'Easter Egg Aura', 'Easter Egg Head Aura', 
+    'Easter Egg Tail Aura', 'Frosted', 'Ghost Aura', 'Gold Coins', 'Golden Shimmer', 
+    'Guiding Star', 'Headless', 'Heartbreak Aura', 'Hologrammic', 'Honey Aura', 'Honeybees', 
+    'Lantern Lights', 'Loving Aura', 'Loving Head Aura', 'Loving Tail Aura', 'Lucky Aura', 
+    'Lucky Head Aura', 'Lucky Tail Aura', 'Malfunction', 'Northern Lights', 'Pastel Chalk', 
+    'Pollen Aura', 'Primordial Storm', 'Ribbon', 'Solar Rays', 'Snowman', 'Suncatcher', 
+    'Super Computer', 'Supercharged', 'Virus', 'Ace of Cards', 'Astrologic Aura', 
+    'Bioluminescent Aura', 'Cosmic Traveller', 'Cozy Campfire', 'Digital Make', 'Easter Bunny', 
+    'Envelopes', 'Fluttering Aura', 'Homestead', 'Icicle', 'Robotics', 'Storm Circuit', 
+]
+
+MUTATION_CAP = 5
+
+# A handful of elements get a hand-picked color; everything else gets a
+# stable color generated from its name, so all 130 elements look distinct
+# without needing to hand-tune every single one.
+ELEMENT_COLOR_OVERRIDES = {
+    "Fire": "#FF5C2E", "Grass": "#4CAF50", "Water": "#3D8EDB", "Lightning": "#F2D11D",
+    "Ice": "#7FD8F2", "Dark": "#1A1A22", "Light": "#FFF3C2", "Toxic": "#9FFF00",
+    "Demon": "#7A0E1E", "Angel": "#FFE9A8", "Sun": "#FFB300", "Moon": "#C9D6E8",
+    "Lava": "#FF4500", "Air": "#D9F2EA", "Ocean": "#2F83FF", "Abyss": "#0D1E25",
+    "Bone": "#E8DFC8", "Ghost": "#C9C2E8", "Christmas": "#C8102E", "Gold": "#F2AD0C",
+    "Diamond": "#BEEFFF", "Rainbow": "#FF6FCB", "Storm": "#6E7B8B", "Frostbite": "#AEE9FF",
+    "Antimatter": "#2B0D88", "Corrosive": "#9FFF00", "Death": "#3B3736", "Life": "#3ABB3B",
+    "Equinox": "#B884FF", "Wraith": "#5C415D", "Celestial": "#9499F7", "Metal": "#9C9C9C",
+    "Plasma": "#E934AA", "Eclipse": "#22110A", "Solar Winds": "#FF8500", "Battle": "#8B3220",
+    "Warrior": "#A44B28", "Love": "#FB5E79", "Honey": "#FDD68B", "Carrot": "#FF8500",
+    "Moss": "#3ABB3B", "Sakura": "#FFB7B4", "Bluefire": "#2F83FF", "Relic": "#B2560D",
+    "Tempest": "#6E7B8B",
+}
+
+
+def element_hash_color(name):
+    """Deterministic fallback color for any element without a hand-picked one."""
+    h = int(hashlib.md5(name.encode("utf-8")).hexdigest(), 16)
+    hue = (h % 360) / 360.0
+    sat = 0.55 + ((h // 360) % 30) / 100.0
+    light = 0.42 + ((h // 360 // 30) % 22) / 100.0
+    r, g, b = colorsys.hls_to_rgb(hue, light, sat)
+    return f"#{int(r * 255):02x}{int(g * 255):02x}{int(b * 255):02x}"
+
+
+def get_element_color(name):
+    return ELEMENT_COLOR_OVERRIDES.get(name) or element_hash_color(name)
+
+
+def get_color_hex(name, element=None):
+    """Resolve a Color dropdown value to a hex. 'Legendary' dynamically
+    matches the dragon's element instead of having one fixed color."""
+    if name == "Legendary" and element:
+        return get_element_color(element)
+    return COLOR_HEX_MAP.get(name, "#777777")
+
+
+def readable_text_color(hex_color):
+    """Pick black or white text so it stays legible on any pill/swatch color."""
+    hex_color = hex_color.lstrip("#")
+    r, g, b = (int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
+    luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+    return "#1A1A1B" if luminance > 0.55 else "#FFFFFF"
+
+# =========================================================
+#  FILE LOCATIONS
+# =========================================================
+
+if getattr(sys, "frozen", False):
+    # Running as a packaged .exe (PyInstaller) — use the folder the .exe lives
+    # in, not the temporary extraction folder, so saves/icons are persistent.
+    SCRIPT_DIR = os.path.dirname(sys.executable)
+else:
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+DATA_FILE = os.path.join(SCRIPT_DIR, "dragons_data.json")
+ICON_DIR = os.path.join(SCRIPT_DIR, "assets", "icons")
+LEGENDARY_SHIFT_DIR = os.path.join(SCRIPT_DIR, "assets", "legendary_shifts")
+
+# So a fresh copy of the app — yours or anyone you share it with — always has
+# somewhere to drop icon PNGs into, without needing to create folders by hand.
+os.makedirs(ICON_DIR, exist_ok=True)
+os.makedirs(LEGENDARY_SHIFT_DIR, exist_ok=True)
+
+# =========================================================
+#  DATA
+# =========================================================
+
+DEFAULT_DRAGONS = {}  # new accounts start with an empty roster
+
+# IDs the old demo dragons used to be saved under — stripped out of any
+# existing dragons_data.json on load so upgrading removes them automatically.
+LEGACY_DEMO_DRAGON_IDS = {"ferorex", "zinthros", "amoonita"}
+
+
+def migrate_dragon(d):
+    """Upgrade an entry saved by an older version of this script
+    (Patterns/Finish field names, no Generation, etc.) in place."""
+    if "Colors" not in d and "Patterns" in d:
+        d["Colors"] = d.pop("Patterns")
+    if "Materials" not in d or isinstance(d.get("Materials"), list):
+        if "Finish" in d:
+            d["Materials"] = d.pop("Finish")
+        else:
+            d["Materials"] = {"P": "-", "S": "-", "T": "-"}
+    d.pop("Finish", None)
+    d.pop("Title", None)
+    d.pop("Hunger", None)
+    d.pop("MaxHunger", None)
+    d.pop("Health", None)
+    d.pop("MaxHealth", None)
+    d.pop("Age", None)
+    d.setdefault("Generation", "-")
+    d.setdefault("MaxMutations", MUTATION_CAP)
+    d.setdefault("CosmeticTrait", "None")
+    d.setdefault("Pupil", "-")
+    d.setdefault("Element", "-")
+    return d
+
+
+def save_all_accounts(data):
+    """Write the full {account: {dragon_id: dragon}} structure to disk."""
+    try:
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        print("Could not save dragons:", e)
+
+
+def _is_old_flat_save(raw):
+    """True if `raw` is a pre-account save (dragon_id -> dragon directly,
+    instead of account -> dragon_id -> dragon)."""
+    if not raw:
+        return False
+    first_value = next(iter(raw.values()))
+    return isinstance(first_value, dict) and "Nickname" in first_value
+
+
+def load_all_accounts():
+    """Load the per-account dragon data, migrating an old shared (pre-account)
+    save file if one is found so nothing gets lost in the upgrade."""
+    raw = None
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                raw = json.load(f)
+        except Exception as e:
+            print("Could not read dragons_data.json, falling back to defaults:", e)
+
+    if raw is None:
+        # Brand new install — no accounts yet; the Account Select screen
+        # prompts the person to create their first one.
+        data = {}
+
+    elif _is_old_flat_save(raw):
+        # Upgrading from before accounts existed at all — land the existing
+        # roster under one starter account so nothing gets lost.
+        data = {"Player1": {k: migrate_dragon(v) for k, v in raw.items()}}
+
+    else:
+        # Already account-keyed; just make sure every entry is up to date.
+        data = {acc: {k: migrate_dragon(v) for k, v in roster.items()}
+                for acc, roster in raw.items()}
+
+    # Drop the placeholder example accounts entirely (name and all) if they're
+    # still sitting in a previously-saved file.
+    for legacy_account in LEGACY_EXAMPLE_ACCOUNTS:
+        data.pop(legacy_account, None)
+
+    save_all_accounts(data)
+    return data
+
+
+all_accounts_data = load_all_accounts()
+current_account = None
+dragons = {}  # becomes the active account's roster once one is selected
+
+
+def switch_account(account_name):
+    """Make `dragons` point at the given account's own roster."""
+    global dragons, current_account
+    current_account = account_name
+    dragons = all_accounts_data.setdefault(account_name, {})
+
+
+def persist():
+    """Save everything (all accounts) to disk — call after any change to `dragons`."""
+    save_all_accounts(all_accounts_data)
+
+
+# =========================================================
+#  LOW-LEVEL DRAWING HELPERS
+# =========================================================
+
+
+def center(win, w, h):
+    x = (win.winfo_screenwidth() - w) // 2
+    y = (win.winfo_screenheight() - h) // 2
+    win.geometry(f"{w}x{h}+{x}+{y}")
+
+
+def lighten(hex_color, amount=18):
+    """Positive amount lightens, negative amount darkens."""
+    hex_color = hex_color.lstrip("#")
+    r, g, b = (int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
+    r, g, b = (max(0, min(255, c + amount)) for c in (r, g, b))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def round_rect(canvas, x1, y1, x2, y2, r=18, **kwargs):
+    """Draw a rounded rectangle on a Canvas using a smoothed polygon."""
+    r = min(r, abs(x2 - x1) / 2, abs(y2 - y1) / 2)
+    points = [
+        x1 + r, y1,
+        x2 - r, y1,
+        x2, y1,
+        x2, y1 + r,
+        x2, y2 - r,
+        x2, y2,
+        x2 - r, y2,
+        x1 + r, y2,
+        x1, y2,
+        x1, y2 - r,
+        x1, y1 + r,
+        x1, y1,
+    ]
+    return canvas.create_polygon(points, smooth=True, **kwargs)
+
+
+def outline_text(canvas, x, y, text, font, fill, outline, **kwargs):
+    """Cheap text-stroke effect: draw the outline color offset in 8 directions,
+    then the real fill on top, for that chunky game-font look."""
+    offsets = [(-2, 0), (2, 0), (0, -2), (0, 2),
+               (-1, -1), (1, 1), (-1, 1), (1, -1)]
+    for dx, dy in offsets:
+        canvas.create_text(x + dx, y + dy, text=text, font=font,
+                            fill=outline, **kwargs)
+    canvas.create_text(x, y, text=text, font=font, fill=fill, **kwargs)
+
+
+def draw_star(canvas, cx, cy, r, fill, outline):
+    pts = []
+    for i in range(10):
+        angle = math.pi / 2 + i * math.pi / 5
+        rad = r if i % 2 == 0 else r * 0.45
+        pts.append(cx + rad * math.cos(angle))
+        pts.append(cy - rad * math.sin(angle))
+    canvas.create_polygon(pts, fill=fill, outline=outline, width=2)
+
+
+def draw_bar(canvas, x, y, w, h, value, max_value, text=None):
+    """Glowing rounded stat bar a-la Dragon Adventures."""
+    round_rect(canvas, x, y, x + w, y + h, r=h / 2,
+                fill=PALETTE["bar_track"], outline=PALETTE["bar_border"], width=2)
+
+    frac = 1.0 if not max_value else max(0.0, min(1.0, value / max_value))
+    fill_w = max(h, w * frac)  # keep rounded caps from looking broken
+    if frac > 0:
+        round_rect(canvas, x, y, x + fill_w, y + h, r=h / 2,
+                    fill=PALETTE["bar_fill"], outline="", width=0)
+        round_rect(canvas, x, y, x + fill_w, y + h, r=h / 2,
+                    fill="", outline=PALETTE["bar_border"], width=2)
+
+    if text is None:
+        text = f"{value:,}/{max_value:,}" if isinstance(value, int) else f"{value}/{max_value}"
+    outline_text(canvas, x + w / 2, y + h / 2, text, ("Arial", 12, "bold"),
+                 "white", "#1A3D10")
+
+
+def setup_ttk_style():
+    """Re-skin ttk widgets (just Combobox, for now) to match the purple theme."""
+    style = ttk.Style()
+    try:
+        style.theme_use("clam")
+    except Exception:
+        pass
+    style.configure("Dragon.TCombobox",
+                     fieldbackground=PALETTE["tag_fill"],
+                     background=PALETTE["card_fill"],
+                     foreground="white",
+                     arrowcolor="white",
+                     bordercolor=PALETTE["panel_border"],
+                     selectbackground=PALETTE["tag_fill"],
+                     selectforeground="white")
+    style.map("Dragon.TCombobox",
+              fieldbackground=[("readonly", PALETTE["tag_fill"])],
+              foreground=[("readonly", "white")])
+
+
+def bind_mousewheel(canvas):
+    """Scroll `canvas` on mouse wheel, but only while the cursor is over it —
+    keeps separate scrollable windows from stealing each other's scrolling."""
+    def _scroll(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    def _on_enter(_event):
+        canvas.bind_all("<MouseWheel>", _scroll)
+
+    def _on_leave(_event):
+        canvas.unbind_all("<MouseWheel>")
+
+    canvas.bind("<Enter>", _on_enter)
+    canvas.bind("<Leave>", _on_leave)
+
+
+def rounded_button(canvas, x, y, w, h, text, command, r=16,
+                    fill=None, outline=None, text_fill="white",
+                    font=("Arial", 13, "bold")):
+    fill = fill or PALETTE["card_fill"]
+    outline = outline or PALETTE["card_border"]
+    rect_id = round_rect(canvas, x, y, x + w, y + h, r=r,
+                          fill=fill, outline=outline, width=3)
+    text_id = canvas.create_text(x + w / 2, y + h / 2, text=text,
+                                  fill=text_fill, font=font)
+
+    def on_click(_event):
+        command()
+
+    def on_enter(_event):
+        canvas.itemconfig(rect_id, fill=lighten(fill))
+
+    def on_leave(_event):
+        canvas.itemconfig(rect_id, fill=fill)
+
+    for item in (rect_id, text_id):
+        canvas.tag_bind(item, "<Button-1>", on_click)
+        canvas.tag_bind(item, "<Enter>", on_enter)
+        canvas.tag_bind(item, "<Leave>", on_leave)
+    return rect_id, text_id
+
+
+def make_rounded_photo(path, w, h, radius=16):
+    """Loads an image, resizes, and masks it to rounded corners.
+    Returns an ImageTk.PhotoImage (caller MUST keep a reference)."""
+    img = Image.open(path).convert("RGBA").resize((w, h))
+    mask = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, w, h], radius=radius, fill=255)
+    img.putalpha(mask)
+    return ImageTk.PhotoImage(img)
+
+
+def draw_pill(canvas, x, y, w, h, text, fill,
+              text_fill=None, text_outline=None, font=("Arial", 11, "bold")):
+    """Small rounded capsule used for coat pattern / coat color badges."""
+    text_fill = text_fill or PALETTE["pill_text"]
+    text_outline = text_outline or PALETTE["pill_outline"]
+    round_rect(canvas, x, y, x + w, y + h, r=h / 2,
+                fill=fill, outline="#1C1430", width=2)
+    cx, cy = x + w / 2, y + h / 2
+    for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        canvas.create_text(cx + dx, cy + dy, text=text, font=font, fill=text_outline)
+    canvas.create_text(cx, cy, text=text, font=font, fill=text_fill)
+
+
+def draw_legendary_pill(canvas, x, y, w, h, element, text="Legendary"):
+    """Fills a coat pill with the element's color-shift PNG from
+    assets/legendary_shifts/ instead of a flat color. Returns True on
+    success; False means no matching file was found and the caller
+    should fall back to a normal flat-color draw_pill() instead."""
+    try:
+        photo = make_rounded_photo(legendary_shift_path(element), int(w), int(h), radius=int(h / 2))
+    except Exception:
+        return False
+
+    canvas._refs.append(photo)
+    canvas.create_image(x + w / 2, y + h / 2, image=photo)
+    round_rect(canvas, x, y, x + w, y + h, r=h / 2, fill="", outline="#1C1430", width=2)
+
+    cx, cy = x + w / 2, y + h / 2
+    font = ("Arial", 11, "bold")
+    for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        canvas.create_text(cx + dx, cy + dy, text=text, font=font, fill="#000000")
+    canvas.create_text(cx, cy, text=text, font=font, fill="#FFFFFF")
+    return True
+
+
+def draw_orb(canvas, cx, cy, r, color):
+    """Small glossy sphere icon, used for Element / Pupil rows."""
+    canvas.create_oval(cx - r, cy - r, cx + r, cy + r,
+                        fill=color, outline=lighten(color, -50), width=2)
+    canvas.create_oval(cx - r * 0.5, cy - r * 0.65, cx - r * 0.05, cy - r * 0.15,
+                        fill=lighten(color, 90), outline="")
+
+
+def draw_triangle(canvas, x, y, size, fill):
+    """Small disclosure-arrow icon for section headers."""
+    canvas.create_polygon(x, y - size, x, y + size, x + size * 1.3, y,
+                           fill=fill, outline="")
+
+
+def draw_appearance_row_bg(canvas, x, y, w, h):
+    return round_rect(canvas, x, y, x + w, y + h, r=12,
+                        fill=PALETTE["row_fill"], outline="", width=0)
+
+
+# =========================================================
+#  DETAILS CARD  (the big purple panel)
+# =========================================================
+
+def show_details(parent, container, name, refresh_grid=None):
+    d = dragons[name]
+
+    for w in container.winfo_children():
+        w.destroy()
+
+    W, H = 640, 680
+    c = tk.Canvas(container, width=W, height=H,
+                   bg=PALETTE["bg_outer"], highlightthickness=0)
+    c.pack(padx=20, pady=18)
+    c._refs = []  # keep PhotoImage references alive on the canvas object
+
+    # ---- outer panel ----
+    round_rect(c, 4, 4, W - 4, H - 4, r=28,
+                fill=PALETTE["panel_fill"], outline=PALETTE["panel_border"], width=5)
+
+    # ---- dragon portrait ----
+    img_x, img_y, img_w, img_h = 16, 16, 260, 170
+    round_rect(c, img_x, img_y, img_x + img_w, img_y + img_h, r=18,
+                fill="#2A2143", outline="", width=0)
+    try:
+        photo = make_rounded_photo(d["Image"], img_w, img_h, radius=18)
+        c._refs.append(photo)
+        c.create_image(img_x + img_w / 2, img_y + img_h / 2, image=photo)
+    except Exception:
+        c.create_text(img_x + img_w / 2, img_y + img_h / 2,
+                      text="No Image\nFound", fill="#9B8FCC",
+                      font=("Arial", 13, "bold"), justify="center")
+
+    # ---- name / species / rarity, stacked to the right of the portrait ----
+    right_edge = W - 24
+    outline_text(c, right_edge, img_y + 40, d["Nickname"], ("Arial", 24, "bold"),
+                 PALETTE["title_fill"], PALETTE["title_outline"], anchor="e")
+    c.create_text(right_edge, img_y + 78, text=d["Species"],
+                  fill=PALETTE["label_text"], font=("Arial", 16, "bold"), anchor="e")
+    c.create_text(right_edge, img_y + 106, text=d.get("Rarity", "-"),
+                  fill=RARITY_COLORS.get(d.get("Rarity", ""), RARITY_DEFAULT_COLOR),
+                  font=("Arial", 16, "bold"), anchor="e")
+
+    # ---- Edit / Delete actions ----
+    def handle_edit():
+        def after_save():
+            if refresh_grid:
+                refresh_grid()
+            show_details(parent, container, name, refresh_grid)
+
+        open_dragon_form(parent, after_save, dragon_id=name)
+
+    def handle_delete():
+        if messagebox.askyesno("Delete dragon", f"Delete {d['Nickname']}? This can't be undone."):
+            dragons.pop(name, None)
+            persist()
+            for w in container.winfo_children():
+                w.destroy()
+            tk.Label(container, text="Select a dragon from the list",
+                     fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+                     font=("Arial", 12, "bold")).pack(pady=40)
+            if refresh_grid:
+                refresh_grid()
+
+    action_y0, action_h = img_y + img_h + 10, 30
+    btn_w, btn_gap = 90, 10
+    delete_x0 = W - 20 - btn_w
+    edit_x0 = delete_x0 - btn_gap - btn_w
+    rounded_button(c, edit_x0, action_y0, btn_w, action_h, "Edit", handle_edit, r=10,
+                    fill=PALETTE["card_fill"], outline=PALETTE["card_border"])
+    rounded_button(c, delete_x0, action_y0, btn_w, action_h, "Delete", handle_delete, r=10,
+                    fill="#7A2020", outline="#4A1010")
+
+    # ---- Appearance panel ----
+    rx, rw = 20, W - 40
+    header_y0 = action_y0 + action_h + 14
+    header_y1 = header_y0 + 44
+
+    round_rect(c, rx, header_y0, rx + rw, header_y1, r=14,
+                fill=PALETTE["header_band"], outline=PALETTE["header_band_border"], width=2)
+    draw_triangle(c, rx + 22, (header_y0 + header_y1) / 2, 8, "#F2A93B")
+    outline_text(c, rx + 50, (header_y0 + header_y1) / 2, "Appearance",
+                 ("Arial", 16, "bold"), "#FFD24C", "#5C3A12", anchor="w")
+
+    row_h, row_gap = 40, 6
+    element = d.get("Element", "Ice")
+    row_defs = [
+        ("coat", "Primary Coat", "P", None),
+        ("coat", "Secondary Coat", "S", None),
+        ("coat", "Tertiary Coat", "T", None),
+        ("emoji", "Mutations", "\U0001F9EC",
+         f"{d.get('Mutations', 0)}/{d.get('MaxMutations', 0)}"),
+        ("emoji", "Cosmetic Trait", "\U0001FA84", d.get("CosmeticTrait", "None")),
+        ("orb", "Element", element, element),
+        ("orb", "Pupil", element, d.get("Pupil", "-")),
+        ("plain", "Generation", None, d.get("Generation", "-")),
+    ]
+
+    ry = header_y1 + 8
+    for kind, label, icon, value in row_defs:
+        draw_appearance_row_bg(c, rx, ry, rw, row_h)
+        rcy = ry + row_h / 2
+
+        if kind == "coat":
+            c.create_text(rx + 20, rcy, text=label, fill=PALETTE["label_text"],
+                          font=("Arial", 14, "bold"), anchor="w")
+            slot = icon
+            color_name = d.get("Colors", {}).get(slot, "-")
+            material = d.get("Materials", {}).get(slot, "-")
+            color_hex = get_color_hex(color_name, element)
+            text_fill = readable_text_color(color_hex)
+            text_outline = "#000000" if text_fill == "#FFFFFF" else "#FFFFFF"
+            pill_w, pill_h, pill_gap = 110, 28, 8
+            p2x = rx + rw - 18 - pill_w
+            p1x = p2x - pill_gap - pill_w
+            p1y = rcy - pill_h / 2
+            if color_name == "Legendary":
+                if not draw_legendary_pill(c, p1x, p1y, pill_w, pill_h, element):
+                    draw_pill(c, p1x, p1y, pill_w, pill_h, color_name, color_hex,
+                              text_fill=text_fill, text_outline=text_outline)
+            else:
+                draw_pill(c, p1x, p1y, pill_w, pill_h, color_name, color_hex,
+                          text_fill=text_fill, text_outline=text_outline)
+            draw_pill(c, p2x, rcy - pill_h / 2, pill_w, pill_h, material, "#FFFFFF",
+                      text_fill="#2F7FBF", text_outline="#BFE0F5")
+        elif kind == "plain":
+            c.create_text(rx + 20, rcy, text=label, fill=PALETTE["label_text"],
+                          font=("Arial", 14, "bold"), anchor="w")
+            outline_text(c, rx + rw - 18, rcy, str(value), ("Arial", 15, "bold"),
+                         PALETTE["value_text"], PALETTE["value_outline"], anchor="e")
+        else:
+            if kind == "emoji":
+                c.create_text(rx + 18, rcy, text=icon, font=("Arial", 15))
+            else:  # orb icon (Element / Pupil) — tinted to the dragon's element
+                draw_orb(c, rx + 18, rcy, 9, get_element_color(icon))
+            c.create_text(rx + 44, rcy, text=label, fill=PALETTE["label_text"],
+                          font=("Arial", 14, "bold"), anchor="w")
+            outline_text(c, rx + rw - 18, rcy, str(value), ("Arial", 15, "bold"),
+                         PALETTE["value_text"], PALETTE["value_outline"], anchor="e")
+
+        ry += row_h + row_gap
+
+
+# =========================================================
+#  LAIR  (search + dragon grid + details panel)
+# =========================================================
+
+def make_dragon_card(parent, name, d, on_click):
+    w, h = 150, 190
+    c = tk.Canvas(parent, width=w, height=h, bg=PALETTE["bg_outer"], highlightthickness=0)
+    rect_id = round_rect(c, 5, 5, w - 5, h - 5, r=18,
+                          fill=PALETTE["card_fill"], outline=PALETTE["card_border"], width=3)
+    c._refs = []
+
+    try:
+        img = Image.open(d["Image"]).resize((100, 100))
+        photo = ImageTk.PhotoImage(img)
+        c._refs.append(photo)
+        c.create_image(w / 2, 70, image=photo)
+    except Exception:
+        round_rect(c, w / 2 - 45, 25, w / 2 + 45, 115, r=12,
+                    fill=RARITY_COLORS.get(d["Rarity"], "#888888"))
+        c.create_text(w / 2, 70, text=name, fill="white",
+                      font=("Arial", 9, "bold"), width=80, justify="center")
+
+    c.create_text(w / 2, 142, text=d["Nickname"], fill="white", font=("Arial", 12, "bold"))
+    c.create_text(w / 2, 162, text=d["Rarity"],
+                  fill=RARITY_COLORS.get(d["Rarity"], "white"), font=("Arial", 9, "bold"))
+
+    def handler(_event):
+        on_click(name)
+
+    def on_enter(_event):
+        c.itemconfig(rect_id, fill=lighten(PALETTE["card_fill"]))
+
+    def on_leave(_event):
+        c.itemconfig(rect_id, fill=PALETTE["card_fill"])
+
+    c.bind("<Button-1>", handler)
+    c.bind("<Enter>", on_enter)
+    c.bind("<Leave>", on_leave)
+    return c
+
+
+def open_lair(root, account):
+    switch_account(account)
+    root.withdraw()
+
+    win = tk.Toplevel()
+    win.title(f"The Lair — {account}")
+    win.configure(bg=PALETTE["bg_outer"])
+    center(win, 1100, 760)
+
+    def back_to_accounts():
+        win.destroy()
+        root.deiconify()
+
+    win.protocol("WM_DELETE_WINDOW", back_to_accounts)
+
+    # LEFT: search + scrollable dragon grid
+    left = tk.Frame(win, bg=PALETTE["bg_outer"], width=380)
+    left.pack(side="left", fill="y")
+    left.pack_propagate(False)
+
+    tk.Label(left, text=f"Logged in as {account}", fg=PALETTE["label_text"],
+             bg=PALETTE["bg_outer"], font=("Arial", 10, "bold")).pack(pady=(12, 2))
+
+    back_canvas = tk.Canvas(left, width=352, height=34, bg=PALETTE["bg_outer"], highlightthickness=0)
+    back_canvas.pack(padx=14, pady=(2, 0))
+    rounded_button(back_canvas, 2, 2, 350, 32, "\u2190 Switch Account", back_to_accounts, r=12,
+                    fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"])
+
+    search_var = tk.StringVar()
+    search_box = tk.Frame(left, bg=PALETTE["bg_outer"])
+    search_box.pack(fill="x", padx=14, pady=14)
+
+    search_canvas = tk.Canvas(search_box, height=40, bg=PALETTE["bg_outer"], highlightthickness=0)
+    search_canvas.pack(fill="x")
+    round_rect(search_canvas, 2, 2, 352, 38, r=14,
+                fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"], width=2)
+    search = tk.Entry(search_canvas, textvariable=search_var,
+                       bg=PALETTE["tag_fill"], fg="white",
+                       insertbackground="white", relief="flat",
+                       font=("Arial", 11))
+    search_canvas.create_window(177, 20, window=search, width=320)
+
+    add_canvas = tk.Canvas(left, width=352, height=44, bg=PALETTE["bg_outer"], highlightthickness=0)
+    add_canvas.pack(padx=14, pady=(0, 10))
+    rounded_button(add_canvas, 2, 2, 350, 42, "+ Add Dragon",
+                    lambda: open_dragon_form(win, render), r=14,
+                    fill=PALETTE["badge_fill"], outline=PALETTE["badge_border"],
+                    text_fill="#3A2A06")
+
+    canvas_holder = tk.Frame(left, bg=PALETTE["bg_outer"])
+    canvas_holder.pack(side="left", fill="both", expand=True)
+
+    grid_canvas = tk.Canvas(canvas_holder, bg=PALETTE["bg_outer"], highlightthickness=0)
+    grid_canvas.pack(side="left", fill="both", expand=True)
+
+    scrollbar = tk.Scrollbar(canvas_holder, command=grid_canvas.yview)
+    scrollbar.pack(side="right", fill="y")
+    grid_canvas.configure(yscrollcommand=scrollbar.set)
+
+    list_frame = tk.Frame(grid_canvas, bg=PALETTE["bg_outer"])
+    grid_canvas.create_window((0, 0), window=list_frame, anchor="nw")
+
+    # RIGHT: details card
+    right = tk.Frame(win, bg=PALETTE["bg_outer"])
+    right.pack(side="right", fill="both", expand=True)
+
+    def render(filter_text=""):
+        for w in list_frame.winfo_children():
+            w.destroy()
+
+        row = col = 0
+        count = 0
+        ft = filter_text.lower()
+        for dragon_id, d in dragons.items():
+            if ft and ft not in d.get("Nickname", "").lower() and ft not in d.get("Species", "").lower():
+                continue
+
+            card = make_dragon_card(list_frame, dragon_id, d,
+                                     lambda n=dragon_id: show_details(win, right, n, render))
+            card.grid(row=row, column=col, padx=8, pady=8)
+            count += 1
+
+            col += 1
+            if col > 1:
+                col = 0
+                row += 1
+
+        if count == 0:
+            msg = "No dragons match your search" if ft else "No dragons yet —\ntap + Add Dragon to add one"
+            tk.Label(list_frame, text=msg, fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+                     font=("Arial", 11, "bold"), justify="center",
+                     wraplength=320).grid(row=0, column=0, columnspan=2, padx=20, pady=50)
+
+        list_frame.update_idletasks()
+        grid_canvas.configure(scrollregion=grid_canvas.bbox("all"))
+
+    search_var.trace_add("write", lambda *_: render(search_var.get()))
+    render()
+
+    bind_mousewheel(grid_canvas)
+
+
+# =========================================================
+#  ADD DRAGON FORM
+# =========================================================
+
+def element_icon_path(element):
+    return os.path.join(ICON_DIR, f"{element.lower().replace(' ', '_')}.png")
+
+
+def legendary_shift_path(element):
+    return os.path.join(LEGENDARY_SHIFT_DIR, f"{element.lower().replace(' ', '_')}.png")
+
+
+def make_element_picker(parent, initial=None):
+    """Searchable, scrollable grid of click-to-select element icons. Looks for
+    a matching PNG in assets/icons/ (e.g. assets/icons/ice.png) and falls back
+    to a colored orb if no icon file has been dropped in yet."""
+    wrap_outer = tk.Frame(parent, bg=PALETTE["bg_outer"])
+    selected = {"value": initial or (ELEMENT_LIST[0] if ELEMENT_LIST else None)}
+    cells = {}
+
+    search_holder, filter_var = styled_entry(wrap_outer, width=400, height=30)
+    search_holder.pack(pady=(0, 6))
+
+    grid_holder = tk.Frame(wrap_outer, bg=PALETTE["bg_outer"])
+    grid_holder.pack()
+
+    grid_canvas = tk.Canvas(grid_holder, width=380, height=210, bg=PALETTE["bg_outer"], highlightthickness=0)
+    grid_canvas.pack(side="left")
+    grid_scroll = tk.Scrollbar(grid_holder, command=grid_canvas.yview)
+    grid_scroll.pack(side="left", fill="y")
+    grid_canvas.configure(yscrollcommand=grid_scroll.set)
+    bind_mousewheel(grid_canvas)
+
+    inner = tk.Frame(grid_canvas, bg=PALETTE["bg_outer"])
+    grid_canvas.create_window((0, 0), window=inner, anchor="nw")
+
+    selected_label = tk.Label(wrap_outer, text=f"Selected: {selected['value']}",
+                               fg=PALETTE["title_fill"], bg=PALETTE["bg_outer"],
+                               font=("Arial", 10, "bold"))
+    selected_label.pack(pady=(6, 0))
+
+    def refresh_highlight():
+        for el, cell in cells.items():
+            is_sel = (el == selected["value"])
+            cell.config(highlightbackground=PALETTE["title_fill"] if is_sel else PALETTE["bg_outer"],
+                        highlightcolor=PALETTE["title_fill"] if is_sel else PALETTE["bg_outer"])
+
+    def render_grid(filter_text=""):
+        for w in inner.winfo_children():
+            w.destroy()
+        cells.clear()
+
+        ft = filter_text.lower()
+        col = row = 0
+        cols = 5
+        for el in ELEMENT_LIST:
+            if ft and ft not in el.lower():
+                continue
+
+            cell = tk.Frame(inner, bg=PALETTE["bg_outer"], highlightthickness=3)
+            cell.grid(row=row, column=col, padx=4, pady=4)
+
+            icon_canvas = tk.Canvas(cell, width=44, height=44, bg=PALETTE["bg_outer"], highlightthickness=0)
+            icon_canvas.pack()
+            try:
+                img = Image.open(element_icon_path(el)).resize((40, 40))
+                photo = ImageTk.PhotoImage(img)
+                icon_canvas.image = photo  # keep reference
+                icon_canvas.create_image(22, 22, image=photo)
+            except Exception:
+                draw_orb(icon_canvas, 22, 22, 16, get_element_color(el))
+
+            tk.Label(cell, text=el, fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+                     font=("Arial", 7, "bold"), wraplength=66, justify="center").pack()
+
+            def select(_event=None, el=el):
+                selected["value"] = el
+                selected_label.config(text=f"Selected: {el}")
+                refresh_highlight()
+
+            icon_canvas.bind("<Button-1>", select)
+            cell.bind("<Button-1>", select)
+            cells[el] = cell
+
+            col += 1
+            if col >= cols:
+                col = 0
+                row += 1
+
+        inner.update_idletasks()
+        grid_canvas.configure(scrollregion=grid_canvas.bbox("all"))
+        refresh_highlight()
+
+    filter_var.trace_add("write", lambda *_: render_grid(filter_var.get()))
+    render_grid()
+
+    return wrap_outer, selected
+
+
+def styled_entry(parent, width=420, height=34, default=""):
+    holder = tk.Canvas(parent, width=width, height=height, bg=PALETTE["bg_outer"], highlightthickness=0)
+    round_rect(holder, 2, 2, width - 2, height - 2, r=12,
+                fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"], width=2)
+    var = tk.StringVar(value=default)
+    entry = tk.Entry(holder, textvariable=var, bg=PALETTE["tag_fill"], fg="white",
+                      insertbackground="white", relief="flat", font=("Arial", 11))
+    holder.create_window(width / 2, height / 2, window=entry, width=width - 24)
+    return holder, var
+
+
+def labeled_field(parent, label_text):
+    wrap = tk.Frame(parent, bg=PALETTE["bg_outer"])
+    wrap.pack(fill="x", padx=20, pady=(10, 2))
+    tk.Label(wrap, text=label_text, fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+             font=("Arial", 11, "bold")).pack(anchor="w")
+    return wrap
+
+
+def labeled_entry(parent, label_text, default=""):
+    wrap = labeled_field(parent, label_text)
+    holder, var = styled_entry(wrap, width=420, height=34, default=default)
+    holder.pack()
+    return var
+
+
+def labeled_combo(parent, label_text, values, default=None):
+    wrap = labeled_field(parent, label_text)
+    var = tk.StringVar(value=default if default is not None else (values[0] if values else ""))
+    combo = ttk.Combobox(wrap, textvariable=var, values=values, state="readonly",
+                          style="Dragon.TCombobox", font=("Arial", 11))
+    combo.pack(fill="x", pady=(2, 0))
+    return var
+
+
+def labeled_double_combo(parent, label_text, left_label, left_values, right_label, right_values,
+                          left_default=None, right_default=None):
+    wrap = labeled_field(parent, label_text)
+    row = tk.Frame(wrap, bg=PALETTE["bg_outer"])
+    row.pack(fill="x", pady=(2, 0))
+
+    left_col = tk.Frame(row, bg=PALETTE["bg_outer"])
+    left_col.pack(side="left", fill="x", expand=True, padx=(0, 5))
+    tk.Label(left_col, text=left_label, fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+             font=("Arial", 9)).pack(anchor="w")
+    lvar = tk.StringVar(value=left_default if left_default is not None else (left_values[0] if left_values else ""))
+    lcombo = ttk.Combobox(left_col, textvariable=lvar, values=left_values, state="readonly",
+                           style="Dragon.TCombobox", font=("Arial", 10))
+    lcombo.pack(fill="x")
+
+    right_col = tk.Frame(row, bg=PALETTE["bg_outer"])
+    right_col.pack(side="left", fill="x", expand=True, padx=(5, 0))
+    tk.Label(right_col, text=right_label, fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+             font=("Arial", 9)).pack(anchor="w")
+    rvar = tk.StringVar(value=right_default if right_default is not None else (right_values[0] if right_values else ""))
+    rcombo = ttk.Combobox(right_col, textvariable=rvar, values=right_values, state="readonly",
+                           style="Dragon.TCombobox", font=("Arial", 10))
+    rcombo.pack(fill="x")
+
+    return lvar, rvar, lcombo, rcombo
+
+
+def open_dragon_form(parent_win, refresh_callback, dragon_id=None):
+    editing = dragon_id is not None
+    d = dragons.get(dragon_id, {}) if editing else {}
+
+    form = tk.Toplevel(parent_win)
+    form.title("Edit Dragon" if editing else "Add New Dragon")
+    form.configure(bg=PALETTE["bg_outer"])
+    center(form, 480, 700)
+
+    outer_canvas = tk.Canvas(form, bg=PALETTE["bg_outer"], highlightthickness=0)
+    outer_canvas.pack(side="left", fill="both", expand=True)
+    vscroll = tk.Scrollbar(form, command=outer_canvas.yview)
+    vscroll.pack(side="right", fill="y")
+    outer_canvas.configure(yscrollcommand=vscroll.set)
+
+    body = tk.Frame(outer_canvas, bg=PALETTE["bg_outer"])
+    outer_canvas.create_window((0, 0), window=body, anchor="nw", width=460)
+    body.bind("<Configure>", lambda _e: outer_canvas.configure(scrollregion=outer_canvas.bbox("all")))
+    bind_mousewheel(outer_canvas)
+
+    tk.Label(body, text="Edit Dragon" if editing else "Add New Dragon",
+             fg=PALETTE["title_fill"], bg=PALETTE["bg_outer"],
+             font=("Arial", 18, "bold")).pack(pady=(16, 4))
+
+    # ---- image picker ----
+    img_row = tk.Frame(body, bg=PALETTE["bg_outer"])
+    img_row.pack(pady=10)
+    preview_canvas = tk.Canvas(img_row, width=100, height=100, bg=PALETTE["bg_outer"], highlightthickness=0)
+    preview_canvas.pack(side="left", padx=(20, 14))
+    image_path_var = tk.StringVar(value=d.get("Image", ""))
+
+    def update_preview():
+        preview_canvas.delete("all")
+        round_rect(preview_canvas, 2, 2, 98, 98, r=14, fill="#2A2143",
+                    outline=PALETTE["panel_border"], width=2)
+        try:
+            photo = make_rounded_photo(image_path_var.get(), 90, 90, radius=12)
+            preview_canvas._ref = photo
+            preview_canvas.create_image(50, 50, image=photo)
+        except Exception:
+            preview_canvas.create_text(50, 50, text="No\nImage", fill="#9B8FCC",
+                                        font=("Arial", 9, "bold"), justify="center")
+
+    def browse_image():
+        path = filedialog.askopenfilename(
+            title="Select dragon image",
+            filetypes=[("Image files", "*.png *.jpg *.jpeg *.gif")])
+        if path:
+            image_path_var.set(path)
+            update_preview()
+
+    update_preview()
+    btn_canvas = tk.Canvas(img_row, width=160, height=40, bg=PALETTE["bg_outer"], highlightthickness=0)
+    btn_canvas.pack(side="left")
+    rounded_button(btn_canvas, 0, 0, 160, 40, "Browse Image…", browse_image, r=12)
+
+    # ---- basic info ----
+    nickname_var = labeled_entry(body, "Nickname *", default=d.get("Nickname", ""))
+    species_var = labeled_combo(body, "Species", SPECIES_LIST, default=d.get("Species"))
+    rarity_var = labeled_combo(body, "Rarity", RARITY_LIST, default=d.get("Rarity", "Common"))
+    generation_var = labeled_entry(body, "Generation", default=str(d.get("Generation", "1")))
+
+    # ---- coats ----
+    d_colors = d.get("Colors", {})
+    d_materials = d.get("Materials", {})
+    p_color, p_material, p_color_combo, _p_mat_combo = labeled_double_combo(
+        body, "Primary Coat", "Color", COLOR_LIST, "Material", MATERIAL_LIST,
+        left_default=d_colors.get("P"), right_default=d_materials.get("P"))
+    s_color, s_material, s_color_combo, _s_mat_combo = labeled_double_combo(
+        body, "Secondary Coat", "Color", COLOR_LIST, "Material", MATERIAL_LIST,
+        left_default=d_colors.get("S"), right_default=d_materials.get("S"))
+    t_color, t_material, t_color_combo, _t_mat_combo = labeled_double_combo(
+        body, "Tertiary Coat", "Color", COLOR_LIST, "Material", MATERIAL_LIST,
+        left_default=d_colors.get("T"), right_default=d_materials.get("T"))
+
+    # Only one coat slot may be "Legendary" at a time — once one slot picks it,
+    # remove it from the other two slots' dropdown options until that slot
+    # is changed away from Legendary again.
+    NON_LEGENDARY_COLORS = [c for c in COLOR_LIST if c != "Legendary"]
+    color_vars = [p_color, s_color, t_color]
+    color_combos = [p_color_combo, s_color_combo, t_color_combo]
+
+    def enforce_single_legendary(*_args):
+        legendary_slot = next((i for i, v in enumerate(color_vars) if v.get() == "Legendary"), None)
+        for i, combo in enumerate(color_combos):
+            combo["values"] = COLOR_LIST if (legendary_slot is None or i == legendary_slot) else NON_LEGENDARY_COLORS
+
+    for var in color_vars:
+        var.trace_add("write", enforce_single_legendary)
+    enforce_single_legendary()  # apply immediately in case we're editing a dragon that already has one
+
+    # ---- mutations / traits ----
+    mutations_var = labeled_combo(body, "Mutations", [str(i) for i in range(MUTATION_CAP + 1)],
+                                   default=str(d.get("Mutations", MUTATION_CAP)))
+    cosmetic_var = labeled_combo(body, "Cosmetic Trait", COSMETIC_TRAIT_LIST,
+                                  default=d.get("CosmeticTrait", "None"))
+    pupil_var = labeled_combo(body, "Pupil", PUPIL_LIST, default=d.get("Pupil"))
+
+    # ---- element picker ----
+    elem_wrap = labeled_field(body, "Element")
+    element_row, element_selected = make_element_picker(elem_wrap, initial=d.get("Element", ELEMENT_LIST[0]))
+    element_row.pack(anchor="w")
+
+    # ---- save / cancel ----
+    def save_dragon():
+        nickname = nickname_var.get().strip()
+        if not nickname:
+            messagebox.showwarning("Missing info", "Please enter a nickname for the dragon.")
+            return
+
+        new_id = dragon_id if editing else uuid.uuid4().hex[:10]
+        gen_text = generation_var.get().strip()
+        generation = int(gen_text) if gen_text.isdigit() else (gen_text or "-")
+
+        dragons[new_id] = {
+            "Nickname": nickname,
+            "Species": species_var.get(),
+            "Rarity": rarity_var.get(),
+            "Colors": {"P": p_color.get(), "S": s_color.get(), "T": t_color.get()},
+            "Materials": {"P": p_material.get(), "S": s_material.get(), "T": t_material.get()},
+            "Mutations": int(mutations_var.get()),
+            "MaxMutations": MUTATION_CAP,
+            "CosmeticTrait": cosmetic_var.get(),
+            "Element": element_selected["value"],
+            "Pupil": pupil_var.get(),
+            "Generation": generation,
+            "Image": image_path_var.get(),
+        }
+        persist()
+        if refresh_callback:
+            refresh_callback()
+        form.destroy()
+
+    button_row = tk.Canvas(body, width=420, height=50, bg=PALETTE["bg_outer"], highlightthickness=0)
+    button_row.pack(pady=24)
+    rounded_button(button_row, 0, 0, 200, 50, "Cancel", form.destroy, r=16,
+                    fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"])
+    rounded_button(button_row, 220, 0, 200, 50, "Save Changes" if editing else "Save Dragon",
+                    save_dragon, r=16,
+                    fill=PALETTE["bar_fill"], outline=PALETTE["bar_border"], text_fill="#16330F")
+
+
+# =========================================================
+#  ACCOUNT SELECT
+# =========================================================
+
+def open_add_account_dialog(root, refresh_callback):
+    dialog = tk.Toplevel(root)
+    dialog.title("Add Account")
+    dialog.configure(bg=PALETTE["bg_outer"])
+    center(dialog, 360, 230)
+
+    tk.Label(dialog, text="New Account Name", fg=PALETTE["title_fill"], bg=PALETTE["bg_outer"],
+             font=("Arial", 16, "bold")).pack(pady=(22, 4))
+
+    name_var = labeled_entry(dialog, "Username")
+
+    def create_account():
+        name = name_var.get().strip()
+        if not name:
+            messagebox.showwarning("Missing name", "Please enter an account name.")
+            return
+        if name in all_accounts_data:
+            messagebox.showwarning("Already exists", f'An account named "{name}" already exists.')
+            return
+        all_accounts_data[name] = {}
+        save_all_accounts(all_accounts_data)
+        refresh_callback()
+        dialog.destroy()
+
+    btn_row = tk.Canvas(dialog, width=300, height=50, bg=PALETTE["bg_outer"], highlightthickness=0)
+    btn_row.pack(pady=20)
+    rounded_button(btn_row, 0, 0, 140, 50, "Cancel", dialog.destroy, r=14,
+                    fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"])
+    rounded_button(btn_row, 160, 0, 140, 50, "Create", create_account, r=14,
+                    fill=PALETTE["bar_fill"], outline=PALETTE["bar_border"], text_fill="#16330F")
+
+
+def start():
+    root = tk.Tk()
+    root.title("Accounts")
+    setup_ttk_style()
+    center(root, 440, 600)
+
+    bg_canvas = tk.Canvas(root, width=440, height=600, bg=PALETTE["bg_outer"], highlightthickness=0)
+    bg_canvas.place(x=0, y=0, width=440, height=600)
+    round_rect(bg_canvas, 15, 15, 425, 585, r=26,
+                fill=PALETTE["panel_fill"], outline=PALETTE["panel_border"], width=5)
+    outline_text(bg_canvas, 220, 55, "Select Account", ("Arial", 22, "bold"),
+                 PALETTE["title_fill"], PALETTE["title_outline"])
+
+    list_holder = tk.Frame(root, bg=PALETTE["panel_fill"])
+    list_holder.place(x=30, y=95, width=380, height=375)
+
+    list_canvas = tk.Canvas(list_holder, bg=PALETTE["panel_fill"], highlightthickness=0)
+    list_canvas.pack(side="left", fill="both", expand=True)
+    list_scroll = tk.Scrollbar(list_holder, command=list_canvas.yview)
+    list_scroll.pack(side="right", fill="y")
+    list_canvas.configure(yscrollcommand=list_scroll.set)
+    bind_mousewheel(list_canvas)
+
+    rows_frame = tk.Frame(list_canvas, bg=PALETTE["panel_fill"])
+    list_canvas.create_window((0, 0), window=rows_frame, anchor="nw")
+
+    def render_accounts():
+        for w in rows_frame.winfo_children():
+            w.destroy()
+
+        if not all_accounts_data:
+            tk.Label(rows_frame, text="No accounts yet —\ntap + Add Account below",
+                     fg=PALETTE["label_text"], bg=PALETTE["panel_fill"],
+                     font=("Arial", 12, "bold"), justify="center").pack(pady=60)
+
+        for acc in list(all_accounts_data.keys()):
+            row = tk.Canvas(rows_frame, width=350, height=56, bg=PALETTE["panel_fill"], highlightthickness=0)
+            row.pack(pady=6)
+            round_rect(row, 2, 2, 348, 54, r=14,
+                        fill=PALETTE["card_fill"], outline=PALETTE["card_border"], width=2)
+            rounded_button(row, 6, 6, 270, 44, acc,
+                            lambda r=root, u=acc: open_lair(r, u), r=10,
+                            fill=PALETTE["card_fill"], outline="")
+
+            def make_delete(u=acc):
+                def _delete():
+                    if messagebox.askyesno("Delete account",
+                                            f'Delete "{u}" and all its dragons? This can\'t be undone.'):
+                        all_accounts_data.pop(u, None)
+                        save_all_accounts(all_accounts_data)
+                        render_accounts()
+                return _delete
+
+            rounded_button(row, 282, 6, 62, 44, "\u2715", make_delete(), r=10,
+                            fill="#7A2020", outline="#4A1010")
+
+        rows_frame.update_idletasks()
+        list_canvas.configure(scrollregion=list_canvas.bbox("all"))
+
+    render_accounts()
+
+    add_canvas = tk.Canvas(root, width=380, height=50, bg=PALETTE["bg_outer"], highlightthickness=0)
+    add_canvas.place(x=30, y=485)
+    rounded_button(add_canvas, 0, 0, 380, 50, "+ Add Account",
+                    lambda: open_add_account_dialog(root, render_accounts), r=14,
+                    fill=PALETTE["badge_fill"], outline=PALETTE["badge_border"], text_fill="#3A2A06")
+
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    start()
