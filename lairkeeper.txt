@@ -5,7 +5,9 @@ import hashlib
 import json
 import math
 import os
+import calendar
 import sys
+from datetime import date
 import uuid
 import tkinter as tk
 from tkinter import font as tkfont
@@ -55,7 +57,7 @@ RARITY_COLORS = {
 RARITY_LIST = list(RARITY_COLORS.keys())
 RARITY_DEFAULT_COLOR = "#9499F7"
 
-LEGACY_EXAMPLE_ACCOUNTS = {"test1", "test2", "test3"}
+LEGACY_EXAMPLE_ACCOUNTS = {"tamaraa123", "DragonTamerSuu", "WobblyPengu"}
 
 
 COLOR_HEX_MAP = {
@@ -322,40 +324,276 @@ COLOR_HEX_MAP = {
     'Error: 0F0A09': '#0F0A09',
     'Error: AB5D29': '#AB5D29',
     'Error: 134805': '#134805',
+    'Dune': '#E2DAC0',
+    'Atoll': '#00ABE6',
 }
 
 COLOR_LIST = [
-    'White', 'Snowflake', 'Whisp', 'Whale', 'Mist', 'Storm', 'Silver', 'Gravel', 'Felt', 
-    'Bluesteel', 'Stone', 'Tin', 'Spirit', 'Gloom', 'Coal', 'Gabbro', 'Asphalt', 'Ash', 'Basalt', 
-    'Scoria', 'Boulder', 'Black', 'Pitch', 'Night', 'Depth', 'Blackberry', 'Berry', 'Loulou', 
-    'Lilac', 'Amarklor', 'Grape', 'Petal', 'Satin', 'Haunted', 'Ghost', 'Lavender', 'Amethyst', 
-    'Dart', 'Pansy', 'Bubble', 'Plum', 'Purple', 'Royal', 'Eggplant', 'Midnight', 'Urchin', 
-    'Jelly', 'Smog', 'Sapphire', 'Angler', 'Bluebell', 'Aster', 'Smoke', 'Uranus', 'Rain', 
-    'Periwinkle', 'Stream', 'Aegean', 'Harpy', 'Blue', 'Denim', 'Morpho', 'Raindrop', 'Marine', 
-    'Ocean', 'Drip', 'Cool', 'Sky', 'Cloud', 'Aluminum', 'Iron', 'Dream', 'Abyss', 'Trench', 
-    'Twilight', 'Mountain', 'Azure', 'Shell', 'Cerulean', 'Icecap', 'Winter', 'Glacier', 'Glow', 
-    'Cyan', 'Bermuda', 'Lagoon', 'Plankton', 'Turquoise', 'History', 'Spruce', 'Water', 'Glass', 
-    'Pistachio', 'Dolphin', 'Mint', 'Seafoam', 'Caterpillar', 'Jade', 'Spearmint', 'Essence', 
-    'Rainforest', 'Seaweed', 'Algae', 'Forest', 'Hydra', 'Emerald', 'Shamrock', 'Pear', 'Jungle', 
-    'Swamp', 'Root', 'Moonrock', 'Snake', 'Camo', 'Prismarine', 'Scale', 'Ivy', 'Mantis', 'Micah', 
-    'Pea', 'Synthesizer', 'Malachite', 'Fern', 'Stem', 'Green', 'Grass', 'Clover', 'Cactus', 
-    'Leaf', 'Toxin', 'Uranium', 'Corrosion', 'Peridot', 'Cabbage', 'Chartreuse', 'Prehistoric', 
-    'Alligator', 'Olive', 'Murk', 'Bark', 'Amber', 'Sponge', 'Haze', 'Swallowtail', 'Lemon', 
-    'Wasp', 'Yolk', 'Banana', 'Honey', 'Squash', 'Sanddollar', 'Mellow', 'Lychee', 'Creme', 
-    'Pelt', 'Ivory', 'Peanut', 'Gold', 'Marigold', 'Apricot', 'Poppy', 'Yam', 'Orange', 'Peach', 
-    'Silt', 'Sahara', 'Pecan', 'Saffron', 'Chestnut', 'Bronze', 'Sandstone', 'Carrot', 'Fire', 
-    'Pumpkin', 'Sunrise', 'Cinnamon', 'Caramel', 'Acorn', 'Tortilla', 'Hide', 'Beige', 'Pine', 
-    'Soil', 'Coffee', 'Cocoa', 'Chocolate', 'Cappuccino', 'Beach', 'Gingerbread', 'Maple', 
-    'Hazel', 'Coconut', 'Clay', 'Sable', 'Penny', 'Umber', 'Brownie', 'Birch', 'Feldspar', 
-    'Walnut', 'Grain', 'Ginger', 'Starfish', 'Brown', 'Slate', 'Auburn', 'Copper', 'Rust', 
-    'Tomato', 'Vermillion', 'Pepper', 'Cherry', 'Crimson', 'Ruby', 'Garnet', 'Sanguine', 'Blood', 
-    'Rose', 'Cranberry', 'Redwood', 'Strawberry', 'Fruit', 'Carmine', 'Cerise', 'Brick', 'Coral', 
-    'Blush', 'Macaron', 'Sakura', 'Flamingo', 'Peony', 'Dust', 'Ribbon', 'Charm', 'Taffy', 
-    'Candy', 'Bubblegum', 'Watermelon', 'Magenta', 'Fuschia', 'Tulip', 'Razzmatazz', 'Rubellite', 
-    'Raspberry', 'Syrah', 'Mauve', 'Radish', 'Gum', 'Quartz', 'Confetti', 'Petalite', 'Pearl', 
-    'Legendary', 'Error: 2F1B1C', 'Error: 211919', 'Error: 28292B', 'Error: 8C272F', 
-    'Error: 7A87A1', 'Error: 567C3F', 'Error: 013485', 'Error: 0F0A09', 'Error: AB5D29', 
-    'Error: 134805', 
+    'White',
+    'Snowflake',
+    'Whisp',
+    'Whale',
+    'Mist',
+    'Storm',
+    'Silver',
+    'Gravel',
+    'Felt',
+    'Bluesteel',
+    'Stone',
+    'Tin',
+    'Spirit',
+    'Gloom',
+    'Coal',
+    'Gabbro',
+    'Asphalt',
+    'Ash',
+    'Basalt',
+    'Scoria',
+    'Boulder',
+    'Black',
+    'Pitch',
+    'Night',
+    'Depth',
+    'Blackberry',
+    'Berry',
+    'Loulou',
+    'Lilac',
+    'Amarklor',
+    'Grape',
+    'Petal',
+    'Satin',
+    'Haunted',
+    'Ghost',
+    'Lavender',
+    'Amethyst',
+    'Dart',
+    'Pansy',
+    'Bubble',
+    'Plum',
+    'Purple',
+    'Royal',
+    'Eggplant',
+    'Midnight',
+    'Urchin',
+    'Jelly',
+    'Smog',
+    'Sapphire',
+    'Angler',
+    'Bluebell',
+    'Aster',
+    'Smoke',
+    'Uranus',
+    'Rain',
+    'Periwinkle',
+    'Stream',
+    'Aegean',
+    'Harpy',
+    'Blue',
+    'Denim',
+    'Morpho',
+    'Raindrop',
+    'Marine',
+    'Ocean',
+    'Drip',
+    'Cool',
+    'Sky',
+    'Cloud',
+    'Aluminum',
+    'Iron',
+    'Dream',
+    'Abyss',
+    'Trench',
+    'Twilight',
+    'Mountain',
+    'Azure',
+    'Shell',
+    'Cerulean',
+    'Icecap',
+    'Winter',
+    'Glacier',
+    'Glow',
+    'Cyan',
+    'Bermuda',
+    'Lagoon',
+    'Plankton',
+    'Turquoise',
+    'History',
+    'Spruce',
+    'Water',
+    'Glass',
+    'Pistachio',
+    'Dolphin',
+    'Mint',
+    'Seafoam',
+    'Caterpillar',
+    'Jade',
+    'Spearmint',
+    'Essence',
+    'Rainforest',
+    'Seaweed',
+    'Algae',
+    'Forest',
+    'Hydra',
+    'Emerald',
+    'Shamrock',
+    'Pear',
+    'Jungle',
+    'Swamp',
+    'Root',
+    'Moonrock',
+    'Snake',
+    'Camo',
+    'Prismarine',
+    'Scale',
+    'Ivy',
+    'Mantis',
+    'Micah',
+    'Pea',
+    'Synthesizer',
+    'Malachite',
+    'Fern',
+    'Stem',
+    'Green',
+    'Grass',
+    'Clover',
+    'Cactus',
+    'Leaf',
+    'Toxin',
+    'Uranium',
+    'Corrosion',
+    'Peridot',
+    'Cabbage',
+    'Chartreuse',
+    'Prehistoric',
+    'Alligator',
+    'Olive',
+    'Murk',
+    'Bark',
+    'Amber',
+    'Sponge',
+    'Haze',
+    'Swallowtail',
+    'Lemon',
+    'Wasp',
+    'Yolk',
+    'Banana',
+    'Honey',
+    'Squash',
+    'Sanddollar',
+    'Mellow',
+    'Lychee',
+    'Creme',
+    'Pelt',
+    'Ivory',
+    'Peanut',
+    'Gold',
+    'Marigold',
+    'Apricot',
+    'Poppy',
+    'Yam',
+    'Orange',
+    'Peach',
+    'Silt',
+    'Sahara',
+    'Pecan',
+    'Saffron',
+    'Chestnut',
+    'Bronze',
+    'Sandstone',
+    'Carrot',
+    'Fire',
+    'Pumpkin',
+    'Sunrise',
+    'Cinnamon',
+    'Caramel',
+    'Acorn',
+    'Tortilla',
+    'Hide',
+    'Beige',
+    'Pine',
+    'Soil',
+    'Coffee',
+    'Cocoa',
+    'Chocolate',
+    'Cappuccino',
+    'Beach',
+    'Gingerbread',
+    'Maple',
+    'Hazel',
+    'Coconut',
+    'Clay',
+    'Sable',
+    'Penny',
+    'Umber',
+    'Brownie',
+    'Birch',
+    'Feldspar',
+    'Walnut',
+    'Grain',
+    'Ginger',
+    'Starfish',
+    'Brown',
+    'Slate',
+    'Auburn',
+    'Copper',
+    'Rust',
+    'Tomato',
+    'Vermillion',
+    'Pepper',
+    'Cherry',
+    'Crimson',
+    'Ruby',
+    'Garnet',
+    'Sanguine',
+    'Blood',
+    'Rose',
+    'Cranberry',
+    'Redwood',
+    'Strawberry',
+    'Fruit',
+    'Carmine',
+    'Cerise',
+    'Brick',
+    'Coral',
+    'Blush',
+    'Macaron',
+    'Sakura',
+    'Flamingo',
+    'Peony',
+    'Dust',
+    'Ribbon',
+    'Charm',
+    'Taffy',
+    'Candy',
+    'Bubblegum',
+    'Watermelon',
+    'Magenta',
+    'Fuschia',
+    'Tulip',
+    'Razzmatazz',
+    'Rubellite',
+    'Raspberry',
+    'Syrah',
+    'Mauve',
+    'Radish',
+    'Gum',
+    'Quartz',
+    'Confetti',
+    'Petalite',
+    'Pearl',
+    'Legendary',
+    'Error: 2F1B1C',
+    'Error: 211919',
+    'Error: 28292B',
+    'Error: 8C272F',
+    'Error: 7A87A1',
+    'Error: 567C3F',
+    'Error: 013485',
+    'Error: 0F0A09',
+    'Error: AB5D29',
+    'Error: 134805',
+    'Dune',
+    'Atoll',
 ]
 
 MATERIAL_LIST = [
@@ -672,7 +910,16 @@ COSMETIC_TRAIT_LIST = [
 
 MUTATION_CAP = 5
 GENDER_LIST = ["Male", "Female"]
+SDA_EXCLUDED = {
+    "Riyu",
+    "Mountain Dragon",
+    "Source Dragon of Motion",
+    "Source Dragon of Energy",
+}
 AGE_LIST = ["Baby", "Juvenile", "Adult", "Elder"]
+MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
+               "July", "August", "September", "October", "November", "December"]
+BIRTHDAY_MIN_YEAR = 1969
 
 POSITIVE_TRAIT_LIST = [
     "None", "Aerodynamic Body", "Beautiful", "High IQ", "Large Lungs", "Sharp Teeth",
@@ -743,12 +990,14 @@ ICON_DIR = os.path.join(SCRIPT_DIR, "assets", "icons")
 LEGENDARY_SHIFT_DIR = os.path.join(SCRIPT_DIR, "assets", "legendary_shifts")
 MISC_DIR = os.path.join(SCRIPT_DIR, "assets", "misc")
 DRAGON_ICONS_DIR = os.path.join(SCRIPT_DIR, "assets", "dragonicons")
+COSMETIC_TRAIT_ICON_DIR = os.path.join(SCRIPT_DIR, "assets", "misc", "cosmetictrait")
 FONTS_DIR = os.path.join(SCRIPT_DIR, "assets", "fonts")
 
 os.makedirs(ICON_DIR, exist_ok=True)
 os.makedirs(LEGENDARY_SHIFT_DIR, exist_ok=True)
 os.makedirs(MISC_DIR, exist_ok=True)
 os.makedirs(DRAGON_ICONS_DIR, exist_ok=True)
+os.makedirs(COSMETIC_TRAIT_ICON_DIR, exist_ok=True)
 os.makedirs(FONTS_DIR, exist_ok=True)
 
 APP_FONT_FAMILY = "Fredoka"
@@ -840,17 +1089,24 @@ LEGACY_DEMO_DRAGON_IDS = {"ferorex", "zinthros", "amoonita"}
 
 
 def species_icon_path(species):
-    """Looks for this species' dragonicons file. Tries '{Species}_Icon.png'
-    first (using the species name's own casing, spaces -> underscores), then
-    a few other common variants, matching case-insensitively — so naming
-    doesn't have to be perfectly consistent across every file."""
-    base = species.replace(" ", "_")
+    base_underscore = species.replace(" ", "_")
+    base_nospace = species.replace(" ", "")
+    base_lower = species.lower().replace(" ", "_")
+    base_lower_nospace = species.lower().replace(" ", "")
     candidates = [
-        f"{base}_Icon.png",
-        f"{base}_icon.png",
-        f"{base}.png",
-        f"{species.lower().replace(' ', '_')}_icon.png",
-        f"{species.lower().replace(' ', '_')}.png",
+        f"{base_underscore}_Icon.png",
+        f"{base_underscore}_icon.png",
+        f"{base_underscore}.png",
+        f"{base_nospace}_Icon.png",
+        f"{base_nospace}_icon.png",
+        f"{base_nospace}.png",
+        f"{species}_Icon.png",
+        f"{species}_icon.png",
+        f"{species}.png",
+        f"{base_lower}_icon.png",
+        f"{base_lower}.png",
+        f"{base_lower_nospace}_icon.png",
+        f"{base_lower_nospace}.png",
     ]
     try:
         existing = {fname.lower(): fname for fname in os.listdir(DRAGON_ICONS_DIR)}
@@ -886,6 +1142,9 @@ def migrate_dragon(d):
     d.setdefault("Pupil", "-")
     d.setdefault("Element", "-")
     d.setdefault("Gender", "")
+    d.setdefault("Soulbound", False)
+    d.setdefault("Birthday", None)
+    d.setdefault("OriginalOwner", None)
     d.setdefault("Level", "-")
     d.setdefault("Age", "-")
     d.setdefault("PositiveTraits", [])
@@ -894,8 +1153,10 @@ def migrate_dragon(d):
     return d
 
 
+TABS_KEY = "__tabs__"
+
+
 def save_all_accounts(data):
-    """Write the full {account: {dragon_id: dragon}} structure to disk."""
     try:
         with open(DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
@@ -904,8 +1165,6 @@ def save_all_accounts(data):
 
 
 def _is_old_flat_save(raw):
-    """True if `raw` is a pre-account save (dragon_id -> dragon directly,
-    instead of account -> dragon_id -> dragon)."""
     if not raw:
         return False
     first_value = next(iter(raw.values()))
@@ -913,8 +1172,6 @@ def _is_old_flat_save(raw):
 
 
 def load_all_accounts():
-    """Load the per-account dragon data, migrating an old shared (pre-account)
-    save file if one is found so nothing gets lost in the upgrade."""
     raw = None
     if os.path.exists(DATA_FILE):
         try:
@@ -925,13 +1182,18 @@ def load_all_accounts():
 
     if raw is None:
         data = {}
-
     elif _is_old_flat_save(raw):
         data = {"Player1": {k: migrate_dragon(v) for k, v in raw.items()}}
-
     else:
-        data = {acc: {k: migrate_dragon(v) for k, v in roster.items()}
-                for acc, roster in raw.items()}
+        data = {}
+        for acc, roster in raw.items():
+            migrated = {}
+            for k, v in roster.items():
+                if k == TABS_KEY:
+                    migrated[TABS_KEY] = v
+                else:
+                    migrated[k] = migrate_dragon(v)
+            data[acc] = migrated
 
     for legacy_account in LEGACY_EXAMPLE_ACCOUNTS:
         data.pop(legacy_account, None)
@@ -943,18 +1205,90 @@ def load_all_accounts():
 all_accounts_data = load_all_accounts()
 current_account = None
 dragons = {}
+current_tabs = {}
+
+
+def get_account_dragons():
+    return {k: v for k, v in all_accounts_data.get(current_account, {}).items()
+            if k != TABS_KEY}
 
 
 def switch_account(account_name):
-    """Make `dragons` point at the given account's own roster."""
-    global dragons, current_account
+    global dragons, current_tabs, current_account
     current_account = account_name
-    dragons = all_accounts_data.setdefault(account_name, {})
+    slot = all_accounts_data.setdefault(account_name, {})
+    if TABS_KEY not in slot:
+        slot[TABS_KEY] = {}
+    dragons = {k: v for k, v in slot.items() if k != TABS_KEY}
+    current_tabs = slot[TABS_KEY]
 
 
 def persist():
-    """Save everything (all accounts) to disk — call after any change to `dragons`."""
+    account_slot = all_accounts_data.setdefault(current_account, {})
+    account_slot[TABS_KEY] = current_tabs
+    for k, v in dragons.items():
+        account_slot[k] = v
+    for k in list(account_slot.keys()):
+        if k != TABS_KEY and k not in dragons:
+            del account_slot[k]
     save_all_accounts(all_accounts_data)
+
+
+def create_tab(name):
+    tab_id = uuid.uuid4().hex[:10]
+    current_tabs[tab_id] = {"name": name, "members": []}
+    persist()
+    return tab_id
+
+
+def delete_tab(tab_id):
+    current_tabs.pop(tab_id, None)
+    persist()
+
+
+def rename_tab(tab_id, new_name):
+    if tab_id in current_tabs:
+        current_tabs[tab_id]["name"] = new_name
+        persist()
+
+
+def add_dragon_to_tab(tab_id, dragon_id):
+    if tab_id in current_tabs and dragon_id not in current_tabs[tab_id]["members"]:
+        current_tabs[tab_id]["members"].append(dragon_id)
+        persist()
+
+
+def remove_dragon_from_tab(tab_id, dragon_id):
+    if tab_id in current_tabs and dragon_id in current_tabs[tab_id]["members"]:
+        current_tabs[tab_id]["members"].remove(dragon_id)
+        persist()
+
+
+def move_dragon_to_account(dragon_id, dest_account):
+    """Moves a dragon record from the current account into dest_account's
+    roster. Drops it from any tabs in the source account (tabs are
+    per-account, so membership there wouldn't carry meaning at the
+    destination). Re-IDs on the rare chance of a dragon_id collision."""
+    if dragon_id not in dragons or dest_account == current_account:
+        return False
+
+    record = dragons.pop(dragon_id)
+
+    for tab in current_tabs.values():
+        if dragon_id in tab.get("members", []):
+            tab["members"].remove(dragon_id)
+
+    dest_slot = all_accounts_data.setdefault(dest_account, {})
+    if TABS_KEY not in dest_slot:
+        dest_slot[TABS_KEY] = {}
+
+    new_id = dragon_id
+    if new_id in dest_slot:
+        new_id = uuid.uuid4().hex[:10]
+    dest_slot[new_id] = record
+
+    persist()
+    return True
 
 
 def center(win, w, h):
@@ -1053,8 +1387,7 @@ def draw_bar(canvas, x, y, w, h, value, max_value, text=None):
                  "white", "#1A3D10")
 
 
-def setup_ttk_style():
-    """Re-skin ttk widgets (just Combobox, for now) to match the purple theme."""
+def setup_ttk_style(root):
     style = ttk.Style()
     try:
         style.theme_use("clam")
@@ -1071,6 +1404,13 @@ def setup_ttk_style():
     style.map("Dragon.TCombobox",
               fieldbackground=[("readonly", PALETTE["tag_fill"])],
               foreground=[("readonly", "white")])
+
+    root.option_add("*TCombobox*Listbox.background", PALETTE["tag_fill"])
+    root.option_add("*TCombobox*Listbox.foreground", "white")
+    root.option_add("*TCombobox*Listbox.selectBackground", PALETTE["card_fill"])
+    root.option_add("*TCombobox*Listbox.selectForeground", "white")
+    root.option_add("*TCombobox*Listbox.relief", "flat")
+    root.option_add("*TCombobox*Listbox.borderWidth", "0")
 
 
 def bind_mousewheel(canvas):
@@ -1229,23 +1569,24 @@ def draw_appearance_row_bg(canvas, x, y, w, h):
 
 
 ROW_ICON_FILES = {
-    "Mutations":      "mut.png",
-    "Cosmetic Trait": "costrait.png",
-    "Age":            "age.png",
+    "Mutations": "mut.png",
+    "Age":       "age.png",
 }
 ROW_ICON_FALLBACK_EMOJI = {
-    "Mutations":      "\U0001F9EC",
-    "Cosmetic Trait": "\U0001FA84",
-    "Age":            "\u23F3",
+    "Mutations": "\U0001F9EC",
+    "Age":       "\u23F3",
 }
 
 
 def draw_row_icon(canvas, x, y, label, icon_value):
-    """Draws the small icon at the left of an Appearance row, dispatching
-    by row label: fixed misc/ icon files for Mutations/Cosmetic Trait/Age,
-    and the dragon's element icon for both Element and Pupil (falling back
-    to a tinted orb if that file isn't there yet)."""
-    if label in ROW_ICON_FILES:
+    if label == "Cosmetic Trait":
+        if not icon_value or icon_value == "None":
+            return
+        if not try_icon(canvas, x, y, cosmetic_trait_icon_path(icon_value), size=24):
+            fallback = os.path.join(MISC_DIR, "costrait.png")
+            if not try_icon(canvas, x, y, fallback, size=24):
+                canvas.create_text(x, y, text="\U0001FA84", font=(APP_FONT_FAMILY, 17))
+    elif label in ROW_ICON_FILES:
         path = os.path.join(MISC_DIR, ROW_ICON_FILES[label])
         if not try_icon(canvas, x, y, path, size=24):
             canvas.create_text(x, y, text=ROW_ICON_FALLBACK_EMOJI[label], font=(APP_FONT_FAMILY, 17))
@@ -1275,7 +1616,7 @@ def draw_trait_row(canvas, x, y, w, h, trait_entry, accent_color):
 genetic_traits_expanded = {}
 
 
-def show_details(parent, container, name, refresh_grid=None):
+def show_details(parent, container, name, refresh_grid=None, active_tab=None):
     d = dragons[name]
 
     for w in container.winfo_children():
@@ -1283,7 +1624,8 @@ def show_details(parent, container, name, refresh_grid=None):
 
     W = 640
     is_traits_expanded = genetic_traits_expanded.get(name, False)
-    H = 990 if is_traits_expanded else 728
+    extra_optional_rows = sum(1 for v in (d.get("Birthday"), d.get("OriginalOwner")) if v)
+    H = (990 if is_traits_expanded else 728) + extra_optional_rows * 46
     c = tk.Canvas(container, width=W, height=H,
                    bg=PALETTE["lair_bg"], highlightthickness=0)
     c.pack(padx=20, pady=18)
@@ -1338,11 +1680,28 @@ def show_details(parent, container, name, refresh_grid=None):
                   fill=RARITY_COLORS.get(d.get("Rarity", ""), RARITY_DEFAULT_COLOR),
                   font=(APP_FONT_FAMILY, 16, APP_FONT_WEIGHT), anchor="e")
 
+    if d.get("Soulbound"):
+        sb_size = 32
+        sb_x = img_x + img_w - sb_size // 2 - 2
+        sb_y = img_y + img_h - sb_size // 2 - 2
+        sb_path = os.path.join(MISC_DIR, "soulbound.png")
+        try:
+            sbimg = Image.open(sb_path).convert("RGBA")
+            sbimg = autocrop_to_content(sbimg)
+            sbimg = fit_contain(sbimg, sb_size, sb_size)
+            sbphoto = ImageTk.PhotoImage(sbimg)
+            c._refs.append(sbphoto)
+            c.create_image(sb_x, sb_y, image=sbphoto)
+        except Exception as e:
+            print(f"[soulbound] Failed to load {sb_path!r}: {e}")
+            c.create_text(sb_x, sb_y, text="\u26d4", fill="#FFD700",
+                          font=(APP_FONT_FAMILY, 18, APP_FONT_WEIGHT))
+
     def handle_edit():
         def after_save():
             if refresh_grid:
                 refresh_grid()
-            show_details(parent, container, name, refresh_grid)
+            show_details(parent, container, name, refresh_grid, active_tab)
 
         open_dragon_form(parent, after_save, dragon_id=name)
 
@@ -1358,11 +1717,87 @@ def show_details(parent, container, name, refresh_grid=None):
             if refresh_grid:
                 refresh_grid()
 
+    def handle_add_to_collection():
+        if not current_tabs:
+            messagebox.showinfo("No tabs yet",
+                                "Create a tab first using '+ New Tab' in the tab bar.")
+            return
+        dlg = tk.Toplevel(parent)
+        dlg.title("Add to Collection")
+        dlg.configure(bg=PALETTE["bg_outer"])
+        center(dlg, 300, min(60 + len(current_tabs) * 50, 400))
+        tk.Label(dlg, text=f'Add "{d["Nickname"]}" to:',
+                 fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+                 font=(APP_FONT_FAMILY, 11, APP_FONT_WEIGHT)).pack(pady=(16, 8))
+        for tab_id, tab in current_tabs.items():
+            already_in = name in tab.get("members", [])
+            label = f'✓ {tab["name"]}' if already_in else tab["name"]
+            color = PALETTE["bar_fill"] if already_in else PALETTE["card_fill"]
+            def make_click(tid=tab_id, ain=already_in):
+                def click():
+                    if ain:
+                        remove_dragon_from_tab(tid, name)
+                    else:
+                        add_dragon_to_tab(tid, name)
+                    if refresh_grid:
+                        refresh_grid()
+                    dlg.destroy()
+                return click
+            tk.Button(dlg, text=label, command=make_click(),
+                       bg=color, fg="white", relief="flat",
+                       font=(APP_FONT_FAMILY, 10, APP_FONT_WEIGHT),
+                       width=24).pack(pady=4)
+
+    def handle_move_to_account():
+        other_accounts = [a for a in all_accounts_data.keys() if a != current_account]
+        if not other_accounts:
+            messagebox.showinfo("No other accounts",
+                                "Create another account first from the Account Select screen.")
+            return
+        dlg = tk.Toplevel(parent)
+        dlg.title("Move to Account")
+        dlg.configure(bg=PALETTE["bg_outer"])
+        center(dlg, 300, min(60 + len(other_accounts) * 46, 420))
+        tk.Label(dlg, text=f'Move "{d["Nickname"]}" to:',
+                 fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+                 font=(APP_FONT_FAMILY, 11, APP_FONT_WEIGHT)).pack(pady=(16, 8))
+
+        def make_click(dest=None):
+            def click():
+                if messagebox.askyesno("Confirm move",
+                                        f'Move "{d["Nickname"]}" to "{dest}"?\n'
+                                        f"It will be removed from this account.",
+                                        parent=dlg):
+                    move_dragon_to_account(name, dest)
+                    dlg.destroy()
+                    for w in container.winfo_children():
+                        w.destroy()
+                    tk.Label(container, text="Select a dragon from the list",
+                             fg=PALETTE["label_text"], bg=PALETTE["lair_bg"],
+                             font=(APP_FONT_FAMILY, 12, APP_FONT_WEIGHT)).pack(pady=40)
+                    if refresh_grid:
+                        refresh_grid()
+            return click
+
+        for acc in other_accounts:
+            tk.Button(dlg, text=acc, command=make_click(acc),
+                       bg=PALETTE["card_fill"], fg="white", relief="flat",
+                       font=(APP_FONT_FAMILY, 10, APP_FONT_WEIGHT),
+                       width=24).pack(pady=4)
+
     title_stack_bottom = img_y + 104 + 10
     action_y0, action_h = max(img_y + img_h, title_stack_bottom) + 10, 30
-    btn_w, btn_gap = 90, 10
+    btn_w, btn_gap = 78, 8
     delete_x0 = W - 20 - btn_w
     edit_x0 = delete_x0 - btn_gap - btn_w
+    move_x0 = edit_x0 - btn_gap - btn_w - 10
+    coll_x0 = move_x0 - btn_gap - btn_w - 14
+    rounded_button(c, coll_x0, action_y0, btn_w + 14, action_h, "+ Collection",
+                    handle_add_to_collection, r=10,
+                    fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"])
+    rounded_button(c, move_x0, action_y0, btn_w + 10, action_h, "Move",
+                    handle_move_to_account, r=10,
+                    fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"])
     rounded_button(c, edit_x0, action_y0, btn_w, action_h, "Edit", handle_edit, r=10,
                     fill=PALETTE["card_fill"], outline=PALETTE["card_border"])
     rounded_button(c, delete_x0, action_y0, btn_w, action_h, "Delete", handle_delete, r=10,
@@ -1386,11 +1821,22 @@ def show_details(parent, container, name, refresh_grid=None):
         ("icon", "Mutations", None,
          f"{d.get('Mutations', 0)}/{d.get('MaxMutations', 0)}"),
         ("icon", "Age", None, d.get("Age", "-")),
-        ("icon", "Cosmetic Trait", None, d.get("CosmeticTrait", "None")),
+        ("icon", "Cosmetic Trait", d.get("CosmeticTrait", "None"), d.get("CosmeticTrait", "None")),
         ("icon", "Element", element, element),
         ("icon", "Pupil", element, d.get("Pupil", "-")),
         ("plain", "Generation", None, d.get("Generation", "-")),
     ]
+
+    if d.get("Birthday"):
+        try:
+            bdt = date.fromisoformat(d["Birthday"])
+            bday_text = f"{MONTH_NAMES[bdt.month - 1]} {bdt.day}, {bdt.year}"
+        except Exception:
+            bday_text = d["Birthday"]
+        row_defs.append(("plain", "Birthday", None, bday_text))
+
+    if d.get("OriginalOwner"):
+        row_defs.append(("plain", "Original Owner", None, d["OriginalOwner"]))
 
     ry = header_y1 + 8
     for kind, label, icon, value in row_defs:
@@ -1438,7 +1884,7 @@ def show_details(parent, container, name, refresh_grid=None):
 
     def toggle_traits():
         genetic_traits_expanded[name] = not genetic_traits_expanded.get(name, False)
-        show_details(parent, container, name, refresh_grid)
+        show_details(parent, container, name, refresh_grid, active_tab)
 
     traits_header_id = round_rect(c, rx, traits_header_y0, rx + rw, traits_header_y1, r=14,
                                    fill=PALETTE["header_band"], outline=PALETTE["header_band_border"], width=2)
@@ -1514,6 +1960,163 @@ def make_dragon_card(parent, name, d, on_click):
     return c
 
 
+def open_sda_tracker(parent_win):
+    owned_species = set()
+    best_mutations = {}
+    for d in dragons.values():
+        sp = d.get("Species", "")
+        if sp:
+            owned_species.add(sp)
+            mut = int(d.get("Mutations", 0))
+            best_mutations[sp] = max(best_mutations.get(sp, 0), mut)
+
+    def badge_color(sp):
+        mut = best_mutations.get(sp, 0)
+        if mut >= 5:
+            return "#52C724"
+        if mut >= 1:
+            return "#FFB300"
+        return "#8B1A1A"
+
+    total = sum(1 for s in SPECIES_LIST if s not in SDA_EXCLUDED)
+    owned_count = sum(1 for s in SPECIES_LIST if s in owned_species)
+    sda_count = sum(1 for s in SPECIES_LIST
+                    if best_mutations.get(s, 0) >= 5 and s not in SDA_EXCLUDED)
+
+    owned_color = "#52C724"
+    sda_header_color = "#FFB300"
+
+    win = tk.Toplevel(parent_win)
+    win.title("Supreme Dragon Adventurer Tracker")
+    win.configure(bg=PALETTE["bg_outer"])
+    center(win, 980, 760)
+    win.minsize(600, 400)
+
+    header_frame = tk.Frame(win, bg=PALETTE["panel_fill"])
+    header_frame.pack(fill="x")
+
+    header_canvas = tk.Canvas(header_frame, bg=PALETTE["panel_fill"], highlightthickness=0, height=100)
+    header_canvas.pack(fill="x")
+
+    def redraw_header(event=None):
+        w = header_canvas.winfo_width() or 980
+        header_canvas.delete("all")
+        outline_text(header_canvas, w // 2, 26, "Supreme Dragon Adventurer Tracker",
+                     (APP_FONT_FAMILY, 18, APP_FONT_WEIGHT), PALETTE["title_fill"], PALETTE["title_outline"])
+        header_canvas.create_text(w // 4, 66,
+                                   text=f"Owned:  {owned_count} / {total}",
+                                   fill=owned_color, font=(APP_FONT_FAMILY, 14, APP_FONT_WEIGHT))
+        header_canvas.create_text(w * 3 // 4, 66,
+                                   text=f"SDA-Ready (5/5):  {sda_count} / {total}",
+                                   fill=sda_header_color, font=(APP_FONT_FAMILY, 14, APP_FONT_WEIGHT))
+
+    header_canvas.bind("<Configure>", lambda e: redraw_header())
+
+    body_outer = tk.Frame(win, bg=PALETTE["bg_outer"])
+    body_outer.pack(fill="both", expand=True)
+
+    scroll_canvas = tk.Canvas(body_outer, bg=PALETTE["bg_outer"], highlightthickness=0)
+    scroll_canvas.pack(side="left", fill="both", expand=True)
+    vscroll = tk.Scrollbar(body_outer, command=scroll_canvas.yview)
+    vscroll.pack(side="right", fill="y")
+    scroll_canvas.configure(yscrollcommand=vscroll.set)
+    bind_mousewheel(scroll_canvas)
+
+    grid_frame = tk.Frame(scroll_canvas, bg=PALETTE["bg_outer"])
+    win_id = scroll_canvas.create_window((0, 0), window=grid_frame, anchor="nw")
+
+    icon_cache = {}
+
+    def build_grid(available_width):
+        for w in grid_frame.winfo_children():
+            w.destroy()
+
+        PAD = 8
+        MIN_CELL_W = 200
+        cols = max(2, available_width // (MIN_CELL_W + PAD))
+        cell_w = (available_width - PAD * (cols + 1)) // cols
+        icon_s = max(44, min(80, cell_w // 3))
+        cell_h = icon_s + 24
+        name_font_size = max(9, min(13, cell_w // 18))
+        badge_font_size = max(7, name_font_size - 2)
+
+        for idx, species in enumerate(SPECIES_LIST):
+            row_i = idx // cols
+            col_i = idx % cols
+
+            is_owned = species in owned_species
+            is_excluded = species in SDA_EXCLUDED
+            sp_mut = best_mutations.get(species, 0) if not is_excluded else None
+
+            icon_species = "Riyu" if species == "Mountain Dragon" else species
+
+            cell = tk.Canvas(grid_frame, width=cell_w, height=cell_h,
+                              bg=PALETTE["panel_fill"], highlightthickness=0)
+            cell.grid(row=row_i, column=col_i, padx=PAD // 2, pady=PAD // 2)
+            round_rect(cell, 2, 2, cell_w - 2, cell_h - 2, r=10,
+                        fill=PALETTE["row_fill"], outline=PALETTE["panel_border"], width=1)
+
+            icon_cx = icon_s // 2 + 8
+            icon_cy = cell_h // 2
+
+            cache_key = (icon_species, icon_s)
+            if cache_key not in icon_cache:
+                try:
+                    icon_cache[cache_key] = make_rounded_photo(
+                        species_icon_path(icon_species), icon_s, icon_s, radius=8)
+                except Exception:
+                    icon_cache[cache_key] = None
+
+            photo = icon_cache[cache_key]
+            if photo:
+                cell._ref = photo
+                cell.create_image(icon_cx, icon_cy, image=photo)
+            else:
+                cell.create_rectangle(8, (cell_h - icon_s) // 2, 8 + icon_s,
+                                       (cell_h + icon_s) // 2,
+                                       fill=PALETTE["tag_fill"], outline="")
+
+            text_x = icon_s + 16
+            text_w = cell_w - text_x - 8
+            name_color = "#3EBF2F" if is_owned else "#8B1A1A"
+
+            show_badge = sp_mut is not None
+            fitted_size = fit_text_size(species, APP_FONT_FAMILY,
+                                        name_font_size + 3, 8, text_w)
+            text_y = icon_cy - (10 if show_badge else 0)
+            cell.create_text(text_x + text_w // 2, text_y, text=species, fill=name_color,
+                              font=(APP_FONT_FAMILY, fitted_size, APP_FONT_WEIGHT),
+                              width=text_w, justify="center", anchor="center")
+
+            if show_badge:
+                bc = badge_color(species)
+                bw, bh = 38, 17
+                bx = text_x + (text_w - bw) // 2
+                by = icon_cy + 10
+                round_rect(cell, bx, by, bx + bw, by + bh, r=5,
+                            fill=PALETTE["tag_fill"], outline=bc, width=1)
+                cell.create_text(bx + bw // 2, by + bh // 2,
+                                  text=f"{sp_mut}/5",
+                                  fill=bc, font=(APP_FONT_FAMILY, badge_font_size, APP_FONT_WEIGHT))
+
+        grid_frame.update_idletasks()
+        scroll_canvas.configure(scrollregion=scroll_canvas.bbox("all"))
+
+    last_width = {"w": 0}
+
+    def on_canvas_resize(event):
+        w = event.width
+        scroll_canvas.itemconfig(win_id, width=w)
+        if abs(w - last_width["w"]) > 4:
+            last_width["w"] = w
+            build_grid(w)
+
+    scroll_canvas.bind("<Configure>", on_canvas_resize)
+
+    win.update_idletasks()
+    build_grid(scroll_canvas.winfo_width() or 960)
+
+
 def open_lair(root, account):
     switch_account(account)
     root.withdraw()
@@ -1529,6 +2132,8 @@ def open_lair(root, account):
 
     win.protocol("WM_DELETE_WINDOW", back_to_accounts)
 
+    active_tab = {"id": None}
+
     left = tk.Frame(win, bg=PALETTE["lair_bg"], width=380)
     left.pack(side="left", fill="y")
     left.pack_propagate(False)
@@ -1541,10 +2146,17 @@ def open_lair(root, account):
     rounded_button(back_canvas, 2, 2, 350, 32, "\u2190 Switch Account", back_to_accounts, r=12,
                     fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"])
 
+    tab_area = tk.Frame(left, bg=PALETTE["lair_bg"])
+    tab_area.pack(fill="x", padx=14, pady=(10, 0))
+
+    tab_scroll_canvas = tk.Canvas(tab_area, bg=PALETTE["lair_bg"], highlightthickness=0, height=36)
+    tab_scroll_canvas.pack(side="top", fill="x")
+    tab_inner = tk.Frame(tab_scroll_canvas, bg=PALETTE["lair_bg"])
+    tab_scroll_canvas.create_window((0, 0), window=tab_inner, anchor="nw")
+
     search_var = tk.StringVar()
     search_box = tk.Frame(left, bg=PALETTE["lair_bg"])
-    search_box.pack(fill="x", padx=14, pady=(14, 6))
-
+    search_box.pack(fill="x", padx=14, pady=(8, 6))
     search_canvas = tk.Canvas(search_box, height=40, bg=PALETTE["lair_bg"], highlightthickness=0)
     search_canvas.pack(fill="x")
     round_rect(search_canvas, 2, 2, 352, 38, r=14,
@@ -1583,6 +2195,119 @@ def open_lair(root, account):
                     fill=PALETTE["badge_fill"], outline=PALETTE["badge_border"],
                     text_fill="#3A2A06")
 
+    sda_canvas = tk.Canvas(left, width=352, height=36, bg=PALETTE["lair_bg"], highlightthickness=0)
+    sda_canvas.pack(padx=14, pady=(0, 4))
+    rounded_button(sda_canvas, 2, 2, 350, 34, "\u2605 SDA Tracker",
+                    lambda: open_sda_tracker(win), r=12,
+                    fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"])
+
+    select_mode = {"on": False}
+    selected_ids = set()
+
+    sel_canvas = tk.Canvas(left, width=352, height=36, bg=PALETTE["lair_bg"], highlightthickness=0)
+    sel_canvas.pack(padx=14, pady=(0, 4))
+    sel_btn_ids = rounded_button(sel_canvas, 2, 2, 350, 34, "\u2610  Select Mode",
+                                  lambda: toggle_select_mode(), r=12,
+                                  fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"])
+
+    del_canvas = tk.Canvas(left, width=352, height=36, bg=PALETTE["lair_bg"], highlightthickness=0)
+    move_canvas = tk.Canvas(left, width=352, height=36, bg=PALETTE["lair_bg"], highlightthickness=0)
+
+    def refresh_del_button():
+        del_canvas.delete("all")
+        n = len(selected_ids)
+        rounded_button(del_canvas, 2, 2, 350, 34,
+                        f"Delete Selected ({n})",
+                        lambda: batch_delete(), r=12,
+                        fill="#7A2020" if n else PALETTE["row_fill"],
+                        outline="#4A1010" if n else PALETTE["panel_border"])
+
+        move_canvas.delete("all")
+        rounded_button(move_canvas, 2, 2, 350, 34,
+                        f"Move Selected ({n})",
+                        lambda: batch_move(), r=12,
+                        fill=PALETTE["tag_fill"] if n else PALETTE["row_fill"],
+                        outline=PALETTE["panel_border"])
+
+    def toggle_select_mode():
+        select_mode["on"] = not select_mode["on"]
+        selected_ids.clear()
+        if select_mode["on"]:
+            sel_canvas.itemconfig(sel_btn_ids[0], fill=PALETTE["badge_fill"])
+            sel_canvas.itemconfig(sel_btn_ids[1], fill="#3A2A06")
+            sel_canvas.delete("all")
+            rounded_button(sel_canvas, 2, 2, 350, 34, "\u2611  Select Mode  (on)",
+                            lambda: toggle_select_mode(), r=12,
+                            fill=PALETTE["badge_fill"], outline=PALETTE["badge_border"],
+                            text_fill="#3A2A06")
+            move_canvas.pack(padx=14, pady=(0, 4))
+            del_canvas.pack(padx=14, pady=(0, 4))
+            refresh_del_button()
+        else:
+            sel_canvas.delete("all")
+            rounded_button(sel_canvas, 2, 2, 350, 34, "\u2610  Select Mode",
+                            lambda: toggle_select_mode(), r=12,
+                            fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"])
+            del_canvas.pack_forget()
+            move_canvas.pack_forget()
+        render(search_var.get())
+
+    def batch_delete():
+        if not selected_ids:
+            return
+        n = len(selected_ids)
+        names = ", ".join(dragons[i]["Nickname"] for i in selected_ids if i in dragons)
+        if not messagebox.askyesno("Delete dragons",
+                                    f"Permanently delete {n} dragon(s)?\n{names}"):
+            return
+        for did in list(selected_ids):
+            dragons.pop(did, None)
+            for tab in current_tabs.values():
+                if did in tab.get("members", []):
+                    tab["members"].remove(did)
+        selected_ids.clear()
+        persist()
+        for w in right.winfo_children():
+            w.destroy()
+        toggle_select_mode()
+
+    def batch_move():
+        if not selected_ids:
+            return
+        other_accounts = [a for a in all_accounts_data.keys() if a != current_account]
+        if not other_accounts:
+            messagebox.showinfo("No other accounts",
+                                "Create another account first from the Account Select screen.")
+            return
+        dlg = tk.Toplevel(win)
+        dlg.title("Move Selected To")
+        dlg.configure(bg=PALETTE["bg_outer"])
+        center(dlg, 300, min(60 + len(other_accounts) * 46, 420))
+        n = len(selected_ids)
+        tk.Label(dlg, text=f"Move {n} selected dragon(s) to:",
+                 fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+                 font=(APP_FONT_FAMILY, 11, APP_FONT_WEIGHT)).pack(pady=(16, 8))
+
+        def make_click(dest=None):
+            def click():
+                if not messagebox.askyesno("Confirm move",
+                                            f'Move {n} dragon(s) to "{dest}"?',
+                                            parent=dlg):
+                    return
+                for did in list(selected_ids):
+                    move_dragon_to_account(did, dest)
+                dlg.destroy()
+                for w in right.winfo_children():
+                    w.destroy()
+                toggle_select_mode()
+            return click
+
+        for acc in other_accounts:
+            tk.Button(dlg, text=acc, command=make_click(acc),
+                       bg=PALETTE["card_fill"], fg="white", relief="flat",
+                       font=(APP_FONT_FAMILY, 10, APP_FONT_WEIGHT),
+                       width=24).pack(pady=4)
+
     MAX_GRID_HEIGHT = 560
 
     canvas_holder = tk.Frame(left, bg=PALETTE["lair_bg"])
@@ -1614,6 +2339,107 @@ def open_lair(root, account):
     right_canvas.bind("<Configure>", lambda e: right_canvas.itemconfig(right_window_id, width=e.width))
     right.bind("<Configure>", lambda e: right_canvas.configure(scrollregion=right_canvas.bbox("all")))
 
+    def rebuild_tab_bar():
+        for w in tab_inner.winfo_children():
+            w.destroy()
+
+        def make_tab_btn(tab_id, label, is_all=False):
+            is_active = active_tab["id"] == tab_id
+            fill = PALETTE["badge_fill"] if is_active else PALETTE["tag_fill"]
+            text_color = "#3A2A06" if is_active else "white"
+            btn_w = max(80, len(label) * 9 + 20)
+            c = tk.Canvas(tab_inner, width=btn_w, height=30, bg=PALETTE["lair_bg"], highlightthickness=0)
+            c.pack(side="left", padx=(0, 4))
+            round_rect(c, 1, 1, btn_w - 1, 29, r=10, fill=fill, outline=PALETTE["panel_border"], width=2)
+            c.create_text(btn_w // 2 - (0 if is_all else 6), 15, text=label,
+                          fill=text_color, font=(APP_FONT_FAMILY, 9, APP_FONT_WEIGHT))
+            c.bind("<Button-1>", lambda _e: select_tab(tab_id))
+
+            if not is_all:
+                del_x = btn_w - 10
+                del_id = c.create_text(del_x, 15, text="✕", fill="#FF8888",
+                                        font=(APP_FONT_FAMILY, 8, APP_FONT_WEIGHT))
+                c.tag_bind(del_id, "<Button-1>", lambda _e, t=tab_id: confirm_delete_tab(t))
+
+                edit_x = btn_w - 22
+                edit_id = c.create_text(edit_x, 15, text="✎", fill="#CCC",
+                                         font=(APP_FONT_FAMILY, 8, APP_FONT_WEIGHT))
+                c.tag_bind(edit_id, "<Button-1>", lambda _e, t=tab_id, n=label: open_rename_tab(t, n))
+
+        make_tab_btn(None, "All Dragons", is_all=True)
+        for tab_id, tab in current_tabs.items():
+            make_tab_btn(tab_id, tab["name"])
+
+        new_c = tk.Canvas(tab_inner, width=80, height=30, bg=PALETTE["lair_bg"], highlightthickness=0)
+        new_c.pack(side="left", padx=(0, 4))
+        round_rect(new_c, 1, 1, 79, 29, r=10, fill=PALETTE["card_fill"],
+                    outline=PALETTE["panel_border"], width=2)
+        new_c.create_text(40, 15, text="+ New Tab", fill=PALETTE["label_text"],
+                           font=(APP_FONT_FAMILY, 8, APP_FONT_WEIGHT))
+        new_c.bind("<Button-1>", lambda _e: open_new_tab_dialog())
+
+        tab_inner.update_idletasks()
+        tab_scroll_canvas.configure(scrollregion=tab_scroll_canvas.bbox("all"))
+
+    def select_tab(tab_id):
+        active_tab["id"] = tab_id
+        rebuild_tab_bar()
+        render(search_var.get())
+
+    def confirm_delete_tab(tab_id):
+        name = current_tabs.get(tab_id, {}).get("name", "this tab")
+        if messagebox.askyesno("Delete tab", f'Delete "{name}"? Dragons won\'t be removed.'):
+            if active_tab["id"] == tab_id:
+                active_tab["id"] = None
+            delete_tab(tab_id)
+            rebuild_tab_bar()
+            render(search_var.get())
+
+    def open_rename_tab(tab_id, current_name):
+        dlg = tk.Toplevel(win)
+        dlg.title("Rename Tab")
+        dlg.configure(bg=PALETTE["bg_outer"])
+        center(dlg, 320, 160)
+        tk.Label(dlg, text="New name:", fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+                 font=(APP_FONT_FAMILY, 11, APP_FONT_WEIGHT)).pack(pady=(18, 4))
+        var = tk.StringVar(value=current_name)
+        e = tk.Entry(dlg, textvariable=var, bg=PALETTE["tag_fill"], fg="white",
+                      insertbackground="white", relief="flat", font=(APP_FONT_FAMILY, 11))
+        e.pack(fill="x", padx=20)
+        def save():
+            n = var.get().strip()
+            if n:
+                rename_tab(tab_id, n)
+                rebuild_tab_bar()
+                dlg.destroy()
+        tk.Button(dlg, text="Save", command=save, bg=PALETTE["bar_fill"], fg="#16330F",
+                   relief="flat", font=(APP_FONT_FAMILY, 10, APP_FONT_WEIGHT)).pack(pady=14)
+        e.bind("<Return>", lambda _e: save())
+        e.focus_set()
+
+    def open_new_tab_dialog():
+        dlg = tk.Toplevel(win)
+        dlg.title("New Tab")
+        dlg.configure(bg=PALETTE["bg_outer"])
+        center(dlg, 320, 160)
+        tk.Label(dlg, text="Tab name:", fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+                 font=(APP_FONT_FAMILY, 11, APP_FONT_WEIGHT)).pack(pady=(18, 4))
+        var = tk.StringVar()
+        e = tk.Entry(dlg, textvariable=var, bg=PALETTE["tag_fill"], fg="white",
+                      insertbackground="white", relief="flat", font=(APP_FONT_FAMILY, 11))
+        e.pack(fill="x", padx=20)
+        def create():
+            n = var.get().strip()
+            if n:
+                new_id = create_tab(n)
+                rebuild_tab_bar()
+                select_tab(new_id)
+                dlg.destroy()
+        tk.Button(dlg, text="Create", command=create, bg=PALETTE["bar_fill"], fg="#16330F",
+                   relief="flat", font=(APP_FONT_FAMILY, 10, APP_FONT_WEIGHT)).pack(pady=14)
+        e.bind("<Return>", lambda _e: create())
+        e.focus_set()
+
     def matches(d, ft):
         if not ft:
             return True
@@ -1640,23 +2466,67 @@ def open_lair(root, account):
         for w in list_frame.winfo_children():
             w.destroy()
 
+        tab_id = active_tab["id"]
+        tab_members = set(current_tabs[tab_id]["members"]) if tab_id else None
+
         ft = filter_text.lower()
-        items = [(i, d) for i, d in dragons.items() if matches(d, ft)]
-        items.sort(key=sort_key)
+        all_items = [(i, d) for i, d in dragons.items() if matches(d, ft)]
+        if tab_members is not None:
+            all_items = [(i, d) for i, d in all_items if i in tab_members]
+        all_items.sort(key=sort_key)
 
         row = col = 0
-        for dragon_id, d in items:
-            card = make_dragon_card(list_frame, dragon_id, d,
-                                     lambda n=dragon_id: show_details(win, right, n, render))
-            card.grid(row=row, column=col, padx=8, pady=8)
+        for dragon_id, d in all_items:
+            if select_mode["on"]:
+                card = make_dragon_card(list_frame, dragon_id, d, lambda _n: None)
+                card.grid(row=row, column=col, padx=8, pady=8)
+                is_sel = dragon_id in selected_ids
+                card.delete("sel_overlay")
+                box_c = PALETTE["badge_fill"] if is_sel else PALETTE["tag_fill"]
+                box_outline = PALETTE["badge_border"] if is_sel else PALETTE["panel_border"]
+                bx, by, bsz = 6, 6, 18
+                round_rect(card, bx, by, bx + bsz, by + bsz, r=4,
+                            fill=box_c, outline=box_outline, width=2)
+                if is_sel:
+                    card.create_text(bx + bsz // 2, by + bsz // 2, text="\u2714",
+                                      fill="white", font=(APP_FONT_FAMILY, 10, APP_FONT_WEIGHT))
+
+                def make_toggle(did=dragon_id, c=card):
+                    def toggle(_event=None):
+                        if did in selected_ids:
+                            selected_ids.discard(did)
+                        else:
+                            selected_ids.add(did)
+                        refresh_del_button()
+                        render(search_var.get())
+                    return toggle
+
+                card.bind("<Button-1>", make_toggle())
+            else:
+                card = make_dragon_card(list_frame, dragon_id, d,
+                                         lambda n=dragon_id: show_details(win, right, n, render, active_tab))
+                card.grid(row=row, column=col, padx=8, pady=8)
+
+                if tab_id is not None:
+                    rem = tk.Label(card, text="✕", fg="#FF8888", bg=PALETTE["lair_bg"],
+                                    font=(APP_FONT_FAMILY, 8, APP_FONT_WEIGHT), cursor="hand2")
+                    rem.place(x=card.winfo_reqwidth() - 14, y=2)
+                    rem.bind("<Button-1>", lambda _e, did=dragon_id, tid=tab_id: (
+                        remove_dragon_from_tab(tid, did), render(search_var.get())))
 
             col += 1
             if col > 1:
                 col = 0
                 row += 1
 
-        if not items:
-            msg = "No dragons match your search" if ft else "No dragons yet —\ntap + Add Dragon to add one"
+        if not all_items:
+            tab_name = current_tabs.get(tab_id, {}).get("name", "") if tab_id else ""
+            if ft:
+                msg = "No dragons match your search"
+            elif tab_id:
+                msg = f'No dragons in "{tab_name}" yet\nOpen a dragon\'s card and tap + to add'
+            else:
+                msg = "No dragons yet —\ntap + Add Dragon to add one"
             tk.Label(list_frame, text=msg, fg=PALETTE["label_text"], bg=PALETTE["lair_bg"],
                      font=(APP_FONT_FAMILY, 11, APP_FONT_WEIGHT), justify="center",
                      wraplength=320).pack(pady=50)
@@ -1668,6 +2538,7 @@ def open_lair(root, account):
 
     search_var.trace_add("write", lambda *_: render(search_var.get()))
     sort_var.trace_add("write", lambda *_: render(search_var.get()))
+    rebuild_tab_bar()
     render()
 
     bind_mousewheel(grid_canvas)
@@ -1683,6 +2554,26 @@ def legendary_shift_path(element):
 
 def gender_icon_path(gender):
     return os.path.join(MISC_DIR, f"{gender.lower()}.png")
+
+
+def cosmetic_trait_icon_path(trait):
+    base = trait.lower().replace(" ", "_")
+    base_nospace = trait.lower().replace(" ", "")
+    candidates = [
+        f"{base}_icon.png",
+        f"{base}.png",
+        f"{base_nospace}_icon.png",
+        f"{base_nospace}.png",
+    ]
+    try:
+        existing = {f.lower(): f for f in os.listdir(COSMETIC_TRAIT_ICON_DIR)}
+    except Exception:
+        existing = {}
+    for candidate in candidates:
+        match = existing.get(candidate.lower())
+        if match:
+            return os.path.join(COSMETIC_TRAIT_ICON_DIR, match)
+    return os.path.join(COSMETIC_TRAIT_ICON_DIR, candidates[0])
 
 
 def make_element_picker(parent, initial=None):
@@ -1815,9 +2706,98 @@ def labeled_spinbox(parent, label_text, from_, to, default=1):
     return var
 
 
+def labeled_birthday_picker(parent, label_text, default_enabled=False, default_value=None):
+    """An optional Day/Month/Year birthday picker with an enable checkbox.
+    `default_value`, if given, is an ISO date string ('YYYY-MM-DD').
+    Returns (enabled_var, day_var, month_var, year_var, get_iso_or_none)."""
+    wrap = labeled_field(parent, label_text)
+
+    current_year = date.today().year
+    year_choices = [str(y) for y in range(current_year, BIRTHDAY_MIN_YEAR - 1, -1)]
+
+    def_day, def_month, def_year = 1, 1, current_year
+    if default_value:
+        try:
+            dt = date.fromisoformat(default_value)
+            def_day, def_month, def_year = dt.day, dt.month, dt.year
+        except Exception:
+            pass
+
+    enabled_var = tk.BooleanVar(value=default_enabled)
+    tk.Checkbutton(wrap, text="Set a birthday", variable=enabled_var,
+                    bg=PALETTE["bg_outer"], fg="white", selectcolor=PALETTE["tag_fill"],
+                    activebackground=PALETTE["bg_outer"], activeforeground="white",
+                    font=(APP_FONT_FAMILY, 10, APP_FONT_WEIGHT),
+                    command=lambda: set_enabled_state()).pack(anchor="w", pady=(2, 4))
+
+    row = tk.Frame(wrap, bg=PALETTE["bg_outer"])
+    row.pack(fill="x")
+
+    day_var = tk.StringVar(value=str(def_day))
+    month_var = tk.StringVar(value=MONTH_NAMES[def_month - 1])
+    year_var = tk.StringVar(value=str(def_year))
+
+    day_col = tk.Frame(row, bg=PALETTE["bg_outer"])
+    day_col.pack(side="left", padx=(0, 5))
+    tk.Label(day_col, text="Day", fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+             font=(APP_FONT_FAMILY, 9)).pack(anchor="w")
+    day_combo = ttk.Combobox(day_col, textvariable=day_var, width=5, state="readonly",
+                              style="Dragon.TCombobox", font=(APP_FONT_FAMILY, 10))
+    day_combo.pack()
+
+    month_col = tk.Frame(row, bg=PALETTE["bg_outer"])
+    month_col.pack(side="left", padx=5)
+    tk.Label(month_col, text="Month", fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+             font=(APP_FONT_FAMILY, 9)).pack(anchor="w")
+    month_combo = ttk.Combobox(month_col, textvariable=month_var, values=MONTH_NAMES,
+                                width=11, state="readonly", style="Dragon.TCombobox",
+                                font=(APP_FONT_FAMILY, 10))
+    month_combo.pack()
+
+    year_col = tk.Frame(row, bg=PALETTE["bg_outer"])
+    year_col.pack(side="left", padx=(5, 0))
+    tk.Label(year_col, text="Year", fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
+             font=(APP_FONT_FAMILY, 9)).pack(anchor="w")
+    year_combo = ttk.Combobox(year_col, textvariable=year_var, values=year_choices,
+                               width=7, state="readonly", style="Dragon.TCombobox",
+                               font=(APP_FONT_FAMILY, 10))
+    year_combo.pack()
+
+    def refresh_day_options(*_args):
+        try:
+            m = MONTH_NAMES.index(month_var.get()) + 1
+            y = int(year_var.get())
+        except (ValueError, IndexError):
+            m, y = 1, current_year
+        days_in_month = calendar.monthrange(y, m)[1]
+        day_combo["values"] = [str(d) for d in range(1, days_in_month + 1)]
+        if int(day_var.get() or 1) > days_in_month:
+            day_var.set(str(days_in_month))
+
+    month_var.trace_add("write", refresh_day_options)
+    year_var.trace_add("write", refresh_day_options)
+    refresh_day_options()
+
+    def set_enabled_state():
+        state = "readonly" if enabled_var.get() else "disabled"
+        for combo in (day_combo, month_combo, year_combo):
+            combo.configure(state=state)
+
+    set_enabled_state()
+
+    def get_iso_or_none():
+        if not enabled_var.get():
+            return None
+        try:
+            m = MONTH_NAMES.index(month_var.get()) + 1
+            return date(int(year_var.get()), m, int(day_var.get())).isoformat()
+        except Exception:
+            return None
+
+    return enabled_var, day_var, month_var, year_var, get_iso_or_none
+
+
 def labeled_trait_row(parent, label_text, trait_list, trait_default=None, tier_default=1):
-    """One Genetic Trait slot: a trait-name dropdown ('None' = empty slot)
-    plus a 1-10 tier spinbox, side by side."""
     wrap = labeled_field(parent, label_text)
     row = tk.Frame(wrap, bg=PALETTE["bg_outer"])
     row.pack(fill="x", pady=(2, 0))
@@ -1827,8 +2807,9 @@ def labeled_trait_row(parent, label_text, trait_list, trait_default=None, tier_d
     tk.Label(trait_col, text="Trait", fg=PALETTE["label_text"], bg=PALETTE["bg_outer"],
              font=(APP_FONT_FAMILY, 9)).pack(anchor="w")
     trait_var = tk.StringVar(value=trait_default if trait_default in trait_list else trait_list[0])
-    ttk.Combobox(trait_col, textvariable=trait_var, values=trait_list, state="readonly",
-                 style="Dragon.TCombobox", font=(APP_FONT_FAMILY, 10)).pack(fill="x")
+    trait_combo = ttk.Combobox(trait_col, textvariable=trait_var, values=trait_list, state="readonly",
+                                style="Dragon.TCombobox", font=(APP_FONT_FAMILY, 10))
+    trait_combo.pack(fill="x")
 
     tier_col = tk.Frame(row, bg=PALETTE["bg_outer"])
     tier_col.pack(side="left", padx=(5, 0))
@@ -1839,7 +2820,7 @@ def labeled_trait_row(parent, label_text, trait_list, trait_default=None, tier_d
                bg=PALETTE["tag_fill"], fg="white", insertbackground="white", relief="flat",
                buttonbackground=PALETTE["card_fill"], font=(APP_FONT_FAMILY, 10), justify="center").pack()
 
-    return trait_var, tier_var
+    return trait_var, tier_var, trait_combo
 
 
 def make_search_select(parent, values_or_getter, initial=None, height=5, width=420):
@@ -2001,6 +2982,44 @@ def open_dragon_form(parent_win, refresh_callback, dragon_id=None):
     update_preview()
 
     gender_var, _gender_combo = labeled_combo(body, "Gender", GENDER_LIST, default=d.get("Gender", GENDER_LIST[0]))
+
+    soulbound_wrap = labeled_field(body, "Soulbound")
+    soulbound_var = tk.BooleanVar(value=bool(d.get("Soulbound", False)))
+    tk.Checkbutton(soulbound_wrap, text="This dragon is soulbound", variable=soulbound_var,
+                    bg=PALETTE["bg_outer"], fg="white", selectcolor=PALETTE["tag_fill"],
+                    activebackground=PALETTE["bg_outer"], activeforeground="white",
+                    font=(APP_FONT_FAMILY, 10, APP_FONT_WEIGHT)).pack(anchor="w", pady=(2, 0))
+
+    bday_enabled, bday_day, bday_month, bday_year, get_birthday_iso = labeled_birthday_picker(
+        body, "Birthday (optional)",
+        default_enabled=bool(d.get("Birthday")), default_value=d.get("Birthday"))
+
+    owner_enabled_wrap = labeled_field(body, "Original Owner (optional)")
+    owner_enabled_var = tk.BooleanVar(value=bool(d.get("OriginalOwner")))
+    owner_text_var = tk.StringVar(value=d.get("OriginalOwner", ""))
+
+    tk.Checkbutton(owner_enabled_wrap, text="Track original owner", variable=owner_enabled_var,
+                    bg=PALETTE["bg_outer"], fg="white", selectcolor=PALETTE["tag_fill"],
+                    activebackground=PALETTE["bg_outer"], activeforeground="white",
+                    font=(APP_FONT_FAMILY, 10, APP_FONT_WEIGHT),
+                    command=lambda: set_owner_state()).pack(anchor="w", pady=(2, 4))
+
+    owner_holder = tk.Canvas(owner_enabled_wrap, width=420, height=34,
+                              bg=PALETTE["bg_outer"], highlightthickness=0)
+    owner_holder.pack()
+    round_rect(owner_holder, 2, 2, 418, 32, r=12,
+                fill=PALETTE["tag_fill"], outline=PALETTE["panel_border"], width=2)
+    owner_entry_widget = tk.Entry(owner_holder, textvariable=owner_text_var,
+                                   bg=PALETTE["tag_fill"], fg="white",
+                                   insertbackground="white", relief="flat",
+                                   font=(APP_FONT_FAMILY, 11))
+    owner_holder.create_window(210, 17, window=owner_entry_widget, width=396)
+
+    def set_owner_state():
+        owner_entry_widget.configure(state="normal" if owner_enabled_var.get() else "disabled")
+
+    set_owner_state()
+
     _level_raw = d.get("Level", 1)
     level_default = int(_level_raw) if str(_level_raw).isdigit() else 1
     level_var = labeled_spinbox(body, "Level (1-50)", 1, 50, default=level_default)
@@ -2058,23 +3077,49 @@ def open_dragon_form(parent_win, refresh_callback, dragon_id=None):
     d_negative = d.get("NegativeTraits", [])
 
     positive_trait_vars = []
+    positive_trait_combos = []
     for i in range(MAX_POSITIVE_TRAITS):
         existing = d_positive[i] if i < len(d_positive) else {}
-        tvar, nvar = labeled_trait_row(body, f"Positive Trait {i + 1}", POSITIVE_TRAIT_LIST,
-                                        trait_default=existing.get("Trait", "None"),
-                                        tier_default=existing.get("Tier", 1))
+        tvar, nvar, tcombo = labeled_trait_row(body, f"Positive Trait {i + 1}", POSITIVE_TRAIT_LIST,
+                                                trait_default=existing.get("Trait", "None"),
+                                                tier_default=existing.get("Tier", 1))
         positive_trait_vars.append((tvar, nvar))
+        positive_trait_combos.append((tvar, tcombo))
+
+    def enforce_unique_positive_traits(*_args):
+        chosen = {var.get() for var, _ in positive_trait_combos if var.get() != "None"}
+        for var, combo in positive_trait_combos:
+            mine = var.get()
+            available = [t for t in POSITIVE_TRAIT_LIST if t == "None" or t == mine or t not in chosen]
+            combo["values"] = available
+
+    for tvar, _ in positive_trait_combos:
+        tvar.trace_add("write", enforce_unique_positive_traits)
+    enforce_unique_positive_traits()
 
     negative_trait_vars = []
     for i in range(MAX_NEGATIVE_TRAITS):
         existing = d_negative[i] if i < len(d_negative) else {}
-        tvar, nvar = labeled_trait_row(body, f"Negative Trait {i + 1}", NEGATIVE_TRAIT_LIST,
-                                        trait_default=existing.get("Trait", "None"),
-                                        tier_default=existing.get("Tier", 1))
+        tvar, nvar, _ = labeled_trait_row(body, f"Negative Trait {i + 1}", NEGATIVE_TRAIT_LIST,
+                                           trait_default=existing.get("Trait", "None"),
+                                           tier_default=existing.get("Tier", 1))
         negative_trait_vars.append((tvar, nvar))
 
     def save_dragon():
         nickname = nickname_var.get().strip() or species_var.get()
+
+        if bday_enabled.get() and not get_birthday_iso():
+            messagebox.showwarning("Invalid birthday",
+                                    "Birthday is enabled but the selected date isn't valid. "
+                                    "Pick a Day, Month, and Year, or turn the birthday off.")
+            return
+
+        owner_value = owner_text_var.get().strip()
+        if owner_enabled_var.get() and not owner_value:
+            messagebox.showwarning("Missing owner",
+                                    "Original Owner is enabled but no username was entered. "
+                                    "Type a username, or turn this off.")
+            return
 
         new_id = dragon_id if editing else uuid.uuid4().hex[:10]
         gen_text = generation_var.get().strip()
@@ -2102,6 +3147,9 @@ def open_dragon_form(parent_win, refresh_callback, dragon_id=None):
             "Species": species_var.get(),
             "Rarity": rarity_var.get(),
             "Gender": gender_var.get(),
+            "Soulbound": soulbound_var.get(),
+            "Birthday": get_birthday_iso() if bday_enabled.get() else None,
+            "OriginalOwner": owner_value if owner_enabled_var.get() else None,
             "Level": level,
             "Colors": {"P": p_color.get(), "S": s_color.get(), "T": t_color.get()},
             "Materials": {"P": p_material.get(), "S": s_material.get(), "T": t_material.get()},
@@ -2168,7 +3216,7 @@ def start():
     root.title("Accounts")
     set_window_icon(root)
     load_custom_fonts()
-    setup_ttk_style()
+    setup_ttk_style(root)
     center(root, 440, 600)
 
     bg_canvas = tk.Canvas(root, width=440, height=600, bg=PALETTE["bg_outer"], highlightthickness=0)
