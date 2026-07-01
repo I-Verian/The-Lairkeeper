@@ -324,276 +324,40 @@ COLOR_HEX_MAP = {
     'Error: 0F0A09': '#0F0A09',
     'Error: AB5D29': '#AB5D29',
     'Error: 134805': '#134805',
-    'Dune': '#E2DAC0',
-    'Atoll': '#00ABE6',
 }
 
 COLOR_LIST = [
-    'White',
-    'Snowflake',
-    'Whisp',
-    'Whale',
-    'Mist',
-    'Storm',
-    'Silver',
-    'Gravel',
-    'Felt',
-    'Bluesteel',
-    'Stone',
-    'Tin',
-    'Spirit',
-    'Gloom',
-    'Coal',
-    'Gabbro',
-    'Asphalt',
-    'Ash',
-    'Basalt',
-    'Scoria',
-    'Boulder',
-    'Black',
-    'Pitch',
-    'Night',
-    'Depth',
-    'Blackberry',
-    'Berry',
-    'Loulou',
-    'Lilac',
-    'Amarklor',
-    'Grape',
-    'Petal',
-    'Satin',
-    'Haunted',
-    'Ghost',
-    'Lavender',
-    'Amethyst',
-    'Dart',
-    'Pansy',
-    'Bubble',
-    'Plum',
-    'Purple',
-    'Royal',
-    'Eggplant',
-    'Midnight',
-    'Urchin',
-    'Jelly',
-    'Smog',
-    'Sapphire',
-    'Angler',
-    'Bluebell',
-    'Aster',
-    'Smoke',
-    'Uranus',
-    'Rain',
-    'Periwinkle',
-    'Stream',
-    'Aegean',
-    'Harpy',
-    'Blue',
-    'Denim',
-    'Morpho',
-    'Raindrop',
-    'Marine',
-    'Ocean',
-    'Drip',
-    'Cool',
-    'Sky',
-    'Cloud',
-    'Aluminum',
-    'Iron',
-    'Dream',
-    'Abyss',
-    'Trench',
-    'Twilight',
-    'Mountain',
-    'Azure',
-    'Shell',
-    'Cerulean',
-    'Icecap',
-    'Winter',
-    'Glacier',
-    'Glow',
-    'Cyan',
-    'Bermuda',
-    'Lagoon',
-    'Plankton',
-    'Turquoise',
-    'History',
-    'Spruce',
-    'Water',
-    'Glass',
-    'Pistachio',
-    'Dolphin',
-    'Mint',
-    'Seafoam',
-    'Caterpillar',
-    'Jade',
-    'Spearmint',
-    'Essence',
-    'Rainforest',
-    'Seaweed',
-    'Algae',
-    'Forest',
-    'Hydra',
-    'Emerald',
-    'Shamrock',
-    'Pear',
-    'Jungle',
-    'Swamp',
-    'Root',
-    'Moonrock',
-    'Snake',
-    'Camo',
-    'Prismarine',
-    'Scale',
-    'Ivy',
-    'Mantis',
-    'Micah',
-    'Pea',
-    'Synthesizer',
-    'Malachite',
-    'Fern',
-    'Stem',
-    'Green',
-    'Grass',
-    'Clover',
-    'Cactus',
-    'Leaf',
-    'Toxin',
-    'Uranium',
-    'Corrosion',
-    'Peridot',
-    'Cabbage',
-    'Chartreuse',
-    'Prehistoric',
-    'Alligator',
-    'Olive',
-    'Murk',
-    'Bark',
-    'Amber',
-    'Sponge',
-    'Haze',
-    'Swallowtail',
-    'Lemon',
-    'Wasp',
-    'Yolk',
-    'Banana',
-    'Honey',
-    'Squash',
-    'Sanddollar',
-    'Mellow',
-    'Lychee',
-    'Creme',
-    'Pelt',
-    'Ivory',
-    'Peanut',
-    'Gold',
-    'Marigold',
-    'Apricot',
-    'Poppy',
-    'Yam',
-    'Orange',
-    'Peach',
-    'Silt',
-    'Sahara',
-    'Pecan',
-    'Saffron',
-    'Chestnut',
-    'Bronze',
-    'Sandstone',
-    'Carrot',
-    'Fire',
-    'Pumpkin',
-    'Sunrise',
-    'Cinnamon',
-    'Caramel',
-    'Acorn',
-    'Tortilla',
-    'Hide',
-    'Beige',
-    'Pine',
-    'Soil',
-    'Coffee',
-    'Cocoa',
-    'Chocolate',
-    'Cappuccino',
-    'Beach',
-    'Gingerbread',
-    'Maple',
-    'Hazel',
-    'Coconut',
-    'Clay',
-    'Sable',
-    'Penny',
-    'Umber',
-    'Brownie',
-    'Birch',
-    'Feldspar',
-    'Walnut',
-    'Grain',
-    'Ginger',
-    'Starfish',
-    'Brown',
-    'Slate',
-    'Auburn',
-    'Copper',
-    'Rust',
-    'Tomato',
-    'Vermillion',
-    'Pepper',
-    'Cherry',
-    'Crimson',
-    'Ruby',
-    'Garnet',
-    'Sanguine',
-    'Blood',
-    'Rose',
-    'Cranberry',
-    'Redwood',
-    'Strawberry',
-    'Fruit',
-    'Carmine',
-    'Cerise',
-    'Brick',
-    'Coral',
-    'Blush',
-    'Macaron',
-    'Sakura',
-    'Flamingo',
-    'Peony',
-    'Dust',
-    'Ribbon',
-    'Charm',
-    'Taffy',
-    'Candy',
-    'Bubblegum',
-    'Watermelon',
-    'Magenta',
-    'Fuschia',
-    'Tulip',
-    'Razzmatazz',
-    'Rubellite',
-    'Raspberry',
-    'Syrah',
-    'Mauve',
-    'Radish',
-    'Gum',
-    'Quartz',
-    'Confetti',
-    'Petalite',
-    'Pearl',
-    'Legendary',
-    'Error: 2F1B1C',
-    'Error: 211919',
-    'Error: 28292B',
-    'Error: 8C272F',
-    'Error: 7A87A1',
-    'Error: 567C3F',
-    'Error: 013485',
-    'Error: 0F0A09',
-    'Error: AB5D29',
-    'Error: 134805',
-    'Dune',
-    'Atoll',
+    'White', 'Snowflake', 'Whisp', 'Whale', 'Mist', 'Storm', 'Silver', 'Gravel', 'Felt', 
+    'Bluesteel', 'Stone', 'Tin', 'Spirit', 'Gloom', 'Coal', 'Gabbro', 'Asphalt', 'Ash', 'Basalt', 
+    'Scoria', 'Boulder', 'Black', 'Pitch', 'Night', 'Depth', 'Blackberry', 'Berry', 'Loulou', 
+    'Lilac', 'Amarklor', 'Grape', 'Petal', 'Satin', 'Haunted', 'Ghost', 'Lavender', 'Amethyst', 
+    'Dart', 'Pansy', 'Bubble', 'Plum', 'Purple', 'Royal', 'Eggplant', 'Midnight', 'Urchin', 
+    'Jelly', 'Smog', 'Sapphire', 'Angler', 'Bluebell', 'Aster', 'Smoke', 'Uranus', 'Rain', 
+    'Periwinkle', 'Stream', 'Aegean', 'Harpy', 'Blue', 'Denim', 'Morpho', 'Raindrop', 'Marine', 
+    'Ocean', 'Drip', 'Cool', 'Sky', 'Cloud', 'Aluminum', 'Iron', 'Dream', 'Abyss', 'Trench', 
+    'Twilight', 'Mountain', 'Azure', 'Shell', 'Cerulean', 'Icecap', 'Winter', 'Glacier', 'Glow', 
+    'Cyan', 'Bermuda', 'Lagoon', 'Plankton', 'Turquoise', 'History', 'Spruce', 'Water', 'Glass', 
+    'Pistachio', 'Dolphin', 'Mint', 'Seafoam', 'Caterpillar', 'Jade', 'Spearmint', 'Essence', 
+    'Rainforest', 'Seaweed', 'Algae', 'Forest', 'Hydra', 'Emerald', 'Shamrock', 'Pear', 'Jungle', 
+    'Swamp', 'Root', 'Moonrock', 'Snake', 'Camo', 'Prismarine', 'Scale', 'Ivy', 'Mantis', 'Micah', 
+    'Pea', 'Synthesizer', 'Malachite', 'Fern', 'Stem', 'Green', 'Grass', 'Clover', 'Cactus', 
+    'Leaf', 'Toxin', 'Uranium', 'Corrosion', 'Peridot', 'Cabbage', 'Chartreuse', 'Prehistoric', 
+    'Alligator', 'Olive', 'Murk', 'Bark', 'Amber', 'Sponge', 'Haze', 'Swallowtail', 'Lemon', 
+    'Wasp', 'Yolk', 'Banana', 'Honey', 'Squash', 'Sanddollar', 'Mellow', 'Lychee', 'Creme', 
+    'Pelt', 'Ivory', 'Peanut', 'Gold', 'Marigold', 'Apricot', 'Poppy', 'Yam', 'Orange', 'Peach', 
+    'Silt', 'Sahara', 'Pecan', 'Saffron', 'Chestnut', 'Bronze', 'Sandstone', 'Carrot', 'Fire', 
+    'Pumpkin', 'Sunrise', 'Cinnamon', 'Caramel', 'Acorn', 'Tortilla', 'Hide', 'Beige', 'Pine', 
+    'Soil', 'Coffee', 'Cocoa', 'Chocolate', 'Cappuccino', 'Beach', 'Gingerbread', 'Maple', 
+    'Hazel', 'Coconut', 'Clay', 'Sable', 'Penny', 'Umber', 'Brownie', 'Birch', 'Feldspar', 
+    'Walnut', 'Grain', 'Ginger', 'Starfish', 'Brown', 'Slate', 'Auburn', 'Copper', 'Rust', 
+    'Tomato', 'Vermillion', 'Pepper', 'Cherry', 'Crimson', 'Ruby', 'Garnet', 'Sanguine', 'Blood', 
+    'Rose', 'Cranberry', 'Redwood', 'Strawberry', 'Fruit', 'Carmine', 'Cerise', 'Brick', 'Coral', 
+    'Blush', 'Macaron', 'Sakura', 'Flamingo', 'Peony', 'Dust', 'Ribbon', 'Charm', 'Taffy', 
+    'Candy', 'Bubblegum', 'Watermelon', 'Magenta', 'Fuschia', 'Tulip', 'Razzmatazz', 'Rubellite', 
+    'Raspberry', 'Syrah', 'Mauve', 'Radish', 'Gum', 'Quartz', 'Confetti', 'Petalite', 'Pearl', 
+    'Legendary', 'Error: 2F1B1C', 'Error: 211919', 'Error: 28292B', 'Error: 8C272F', 
+    'Error: 7A87A1', 'Error: 567C3F', 'Error: 013485', 'Error: 0F0A09', 'Error: AB5D29', 
+    'Error: 134805', 
 ]
 
 MATERIAL_LIST = [
@@ -629,38 +393,225 @@ ELEMENT_LIST = [
 ]
 
 SPECIES_LIST = [
-    'Aeroseys', 'Aethereus', 'Agricos', 'Alatura', 'Allpehourn', 'Alrenoth', 'Amaris',
-    'Amoonita', 'Amphyll', 'Ancient Aranga', 'Ancient Skriffei', 'Ancient Tosknir',
-    'Andronaut', 'Araneaix', 'Aranga', 'Arielisces', 'Astraeisis', 'Atarix', 'Atravanta',
-    'Aurutentia', 'Avarakuma', 'Avefir', 'Ayatrice', 'Balgunyur', 'Betevial', 'Bisonture',
-    'Bizaltidath', 'Bylendarach', 'Caelydris', 'Calimaki', 'Carnealgon', 'Casirius', 'Catruca',
-    'Caudembris', 'Caunaris', 'Chameleaf', 'Chippychiip', 'Chronocus', 'Chrysaloom',
-    'Cirquemaar', 'Cocovira', 'Cogitergosyn', 'Constello', 'Coralina', 'Corrupted Chronocus',
-    'Cosmalisk', 'Cryptillow', 'Cutiepatoo', 'Cybernid', 'Cynphion-Noire', 'Desygual', 'Dexyn',
-    'Diraixos', 'Djaevelhest', 'Dratheros', 'Dunvolth', 'Dysuva', 'Eisendrache', 'Enkylous',
-    'Eryndiorn', 'Eteralix', 'Fabledrak', 'Falugeis', 'Fayrah', 'Featherfang', 'Fernifex',
-    'Ferorex', 'Firifeller', 'Fleurianthus', 'Flornymphis', 'Fueguin', 'Fulong', 'Gaulyra',
-    'Geliklen', 'Geoteryx', 'Glacegar', 'Glaquacus', 'Goelica', 'Goliatomb', 'Gordigourd',
-    'Guilmoros', 'Gundrakken', 'Gyngefared', 'Gyrocopter', 'Harvitius', 'Hexalios',
-    'Hielochiim', 'Hoarusn', 'Hongliang', 'Howler', 'Ignicaris', 'Impiavolo', 'Iridesia',
-    'Karukiri', 'Khalknirik', 'Khepera', 'Khorgeryn', 'Kikien', 'Kostragula', 'Krekiz',
-    'Ladonix', 'Lepilon', 'Livalient', 'Lucklif', 'Lum Luenh', 'Lumenigh', 'Lunaesol', 'Lyria',
-    'Magmip', 'Makoura', 'Mallopii', 'Malupentys', 'Mechanoxide', 'Mielebee', 'Mistrasune',
-    'Moixaura', 'Mosuraki', 'Mother Dragon', 'Motorouk', 'Mountain Dragon', 'Nadaler',
-    'Nakahii', 'Neroxide', 'Nightmare Paranox', 'Noctorius', "Nor'gan", 'Numine', 'Nyxavoid',
-    'Onagajin', 'Oroalas', 'Ortarouk', 'Ovicirus', 'Pagulau', 'Paladianos', 'Palus',
-    'Pananisea', 'Paranox', 'Paukiki', 'Penguitus', 'Phocaphan', 'Phyllantis', 'Polairistel',
-    'Putrefacceum', 'Quahtona', 'Quasaldrus', 'Quetzaloctli', 'Radidon', 'Raikami', 'Rhyndac',
-    'Riyu', 'Robodon', 'Roborus V', 'Roborus X', 'Rocirus', 'Rozora', 'Saurium', 'Scrawei',
-    'Seikarin', 'Sentalius', 'Silvestratus', 'Skelltor', 'Skriffei', 'Skyrix', 'Smokgien',
-    'Snoballista', 'Solarizon', 'Soukeyi', 'Source Dragon of Energy',
-    'Source Dragon of Motion', 'Stellaris', 'Stratalix', 'Stymelisk', 'Suiikipon', 'Sunfloris',
-    'Syliru', 'Sylva', 'Taihoa', 'Taligris', 'Taraka', 'Tarotta', 'Tempiritus', 'Tenebis',
-    'Terruak', 'Thorkonyx', 'Tianma', 'Tigrilia', 'Tlalocun', 'Torneidus', 'Tosknir',
-    'Trametos', 'Trilinaris', 'Tronat', 'Tsukuizan', 'Tuskaryn', 'Uheailes', 'Valkiero',
-    'Varana', 'Veidreki', 'Venid', 'Venu', 'Verdrakor', 'Verscervus', 'Viridik', 'Volkumos',
-    'Voltagen', 'Voltstorm', 'Vulcoramor', 'Vulpiruth', 'Vyreas', 'Woodluma', 'Wuonghou',
-    'Xellatruce', 'Xerthos', 'Yaruakura', 'Yggdraten', 'Yueshi', 'Yulereinn', 'Zeipera',
+    'Aeroseys',
+    'Aethereus',
+    'Agricos',
+    'Alatura',
+    'Allpehourn',
+    'Alrenoth',
+    'Amaris',
+    'Amoonita',
+    'Amphyll',
+    'Ancient Aranga',
+    'Ancient Skriffei',
+    'Ancient Tosknir',
+    'Andronaut',
+    'Araneaix',
+    'Aranga',
+    'Archogine',
+    'Arielisces',
+    'Astraeisis',
+    'Atarix',
+    'Atravanta',
+    'Aurutentia',
+    'Avarakuma',
+    'Avefir',
+    'Ayatrice',
+    'Balgunyur',
+    'Betevial',
+    'Bisonture',
+    'Bizaltidath',
+    'Bylendarach',
+    'Caelydris',
+    'Calimaki',
+    'Carnealgon',
+    'Casirius',
+    'Catruca',
+    'Caudembris',
+    'Caunaris',
+    'Chameleaf',
+    'Chippychiip',
+    'Chronocus',
+    'Chrysaloom',
+    'Cirquemaar',
+    'Cocovira',
+    'Cogitergosyn',
+    'Constello',
+    'Coralina',
+    'Corrupted Chronocus',
+    'Cosmalisk',
+    'Cryptillow',
+    'Cutiepatoo',
+    'Cybernid',
+    'Cynphion-Noire',
+    'Desygual',
+    'Dexyn',
+    'Diraixos',
+    'Djaevelhest',
+    'Dratheros',
+    'Dunvolth',
+    'Dysuva',
+    'Eisendrache',
+    'Enkylous',
+    'Eryndiorn',
+    'Eteralix',
+    'Fabledrak',
+    'Falugeis',
+    'Fayrah',
+    'Featherfang',
+    'Fernifex',
+    'Ferorex',
+    'Firifeller',
+    'Fleurianthus',
+    'Flornymphis',
+    'Fueguin',
+    'Fulong',
+    'Gaulyra',
+    'Geliklen',
+    'Geoteryx',
+    'Glacegar',
+    'Glaquacus',
+    'Goelica',
+    'Goliatomb',
+    'Gordigourd',
+    'Guilmoros',
+    'Gundrakken',
+    'Gyngefared',
+    'Gyrocopter',
+    'Harvitius',
+    'Hexalios',
+    'Hielochiim',
+    'Hoarusn',
+    'Hongliang',
+    'Howler',
+    'Ignicaris',
+    'Impiavolo',
+    'Iridesia',
+    'Karukiri',
+    'Khalknirik',
+    'Khepera',
+    'Khorgeryn',
+    'Kikien',
+    'Kostragula',
+    'Krekiz',
+    'Ladonix',
+    'Lepilon',
+    'Livalient',
+    'Lucklif',
+    'Lum Luenh',
+    'Lumenigh',
+    'Lunaesol',
+    'Lyria',
+    'Magmip',
+    'Makoura',
+    'Mallopii',
+    'Malupentys',
+    'Mechanoxide',
+    'Mielebee',
+    'Mistrasune',
+    'Moixaura',
+    'Mosuraki',
+    'Mother Dragon',
+    'Motorouk',
+    'Mountain Dragon',
+    'Nadaler',
+    'Nakahii',
+    'Neroxide',
+    'Nightmare Paranox',
+    'Noctorius',
+    "Nor'gan",
+    'Numine',
+    'Nyxavoid',
+    'Onagajin',
+    'Oroalas',
+    'Ortarouk',
+    'Ovicirus',
+    'Pagulau',
+    'Paladianos',
+    'Palus',
+    'Pananisea',
+    'Paranox',
+    'Paukiki',
+    'Penguitus',
+    'Phocaphan',
+    'Phyllantis',
+    'Polairistel',
+    'Putrefacceum',
+    'Quahtona',
+    'Quasaldrus',
+    'Quetzaloctli',
+    'Radidon',
+    'Raikami',
+    'Rhyndac',
+    'Riyu',
+    'Robodon',
+    'Roborus V',
+    'Roborus X',
+    'Rocirus',
+    'Rozora',
+    'Saurium',
+    'Scrawei',
+    'Seikarin',
+    'Sentalius',
+    'Silvestratus',
+    'Skelltor',
+    'Skriffei',
+    'Skyrix',
+    'Smokgien',
+    'Snoballista',
+    'Solarizon',
+    'Soukeyi',
+    'Source Dragon of Energy',
+    'Source Dragon of Motion',
+    'Stellaris',
+    'Stratalix',
+    'Stymelisk',
+    'Suiikipon',
+    'Sunfloris',
+    'Syliru',
+    'Sylva',
+    'Taihoa',
+    'Taligris',
+    'Taraka',
+    'Tarotta',
+    'Tempiritus',
+    'Tenebis',
+    'Terruak',
+    'Thorkonyx',
+    'Tianma',
+    'Tigrilia',
+    'Tlalocun',
+    'Torneidus',
+    'Tosknir',
+    'Trametos',
+    'Trilinaris',
+    'Tronat',
+    'Tsukuizan',
+    'Tuskaryn',
+    'Uheailes',
+    'Valkiero',
+    'Varana',
+    'Veidreki',
+    'Venid',
+    'Venu',
+    'Verdrakor',
+    'Verscervus',
+    'Viridik',
+    'Volkumos',
+    'Voltagen',
+    'Voltstorm',
+    'Vulcoramor',
+    'Vulpiruth',
+    'Vyreas',
+    'Woodluma',
+    'Wuonghou',
+    'Xellatruce',
+    'Xerthos',
+    'Yaruakura',
+    'Yggdraten',
+    'Yueshi',
+    'Yulereinn',
+    'Zeipera',
     'Zinthros',
 ]
 
@@ -884,6 +835,7 @@ SPECIES_RARITY = {
     'Suiikipon': 'Common',
     'Taihoa': 'Common',
     'Venu': 'Common',
+    'Archogine': 'Legendary',
 }
 
 PUPIL_LIST = [
@@ -986,6 +938,7 @@ else:
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 DATA_FILE = os.path.join(SCRIPT_DIR, "dragons_data.json")
+DATA_DIR = os.path.join(SCRIPT_DIR, "data")
 ICON_DIR = os.path.join(SCRIPT_DIR, "assets", "icons")
 LEGENDARY_SHIFT_DIR = os.path.join(SCRIPT_DIR, "assets", "legendary_shifts")
 MISC_DIR = os.path.join(SCRIPT_DIR, "assets", "misc")
@@ -993,6 +946,7 @@ DRAGON_ICONS_DIR = os.path.join(SCRIPT_DIR, "assets", "dragonicons")
 COSMETIC_TRAIT_ICON_DIR = os.path.join(SCRIPT_DIR, "assets", "misc", "cosmetictrait")
 FONTS_DIR = os.path.join(SCRIPT_DIR, "assets", "fonts")
 
+os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(ICON_DIR, exist_ok=True)
 os.makedirs(LEGENDARY_SHIFT_DIR, exist_ok=True)
 os.makedirs(MISC_DIR, exist_ok=True)
@@ -1154,52 +1108,142 @@ def migrate_dragon(d):
 
 
 TABS_KEY = "__tabs__"
+import shutil
 
 
-def save_all_accounts(data):
+def _account_dir(account_name):
+    return os.path.join(DATA_DIR, account_name)
+
+
+def _dragon_path(account_name, dragon_id):
+    return os.path.join(_account_dir(account_name), f"{dragon_id}.json")
+
+
+def _tabs_path(account_name):
+    return os.path.join(_account_dir(account_name), "__tabs__.json")
+
+
+def _write_account(account_name, dragon_dict, tabs_dict):
+    """Write all files for one account: one JSON per dragon + one tabs file.
+    Also removes orphaned dragon files that no longer exist in dragon_dict."""
+    adir = _account_dir(account_name)
+    os.makedirs(adir, exist_ok=True)
+
     try:
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
+        with open(_tabs_path(account_name), "w", encoding="utf-8") as f:
+            json.dump(tabs_dict, f, indent=2)
     except Exception as e:
-        print("Could not save dragons:", e)
+        print(f"Could not save tabs for {account_name}:", e)
+
+    for did, d in dragon_dict.items():
+        try:
+            with open(_dragon_path(account_name, did), "w", encoding="utf-8") as f:
+                json.dump(d, f, indent=2)
+        except Exception as e:
+            print(f"Could not save dragon {did}:", e)
+
+    try:
+        existing_ids = {
+            fname[:-5] for fname in os.listdir(adir)
+            if fname.endswith(".json") and fname != "__tabs__.json"
+        }
+        for orphan in existing_ids - set(dragon_dict.keys()):
+            try:
+                os.remove(_dragon_path(account_name, orphan))
+            except Exception:
+                pass
+    except Exception:
+        pass
 
 
-def _is_old_flat_save(raw):
+def _read_account(account_name):
+    """Read all dragon files + tabs for one account. Returns (dragon_dict, tabs_dict)."""
+    adir = _account_dir(account_name)
+    dragon_dict = {}
+    tabs_dict = {}
+
+    if not os.path.isdir(adir):
+        return dragon_dict, tabs_dict
+
+    tabs_file = _tabs_path(account_name)
+    if os.path.exists(tabs_file):
+        try:
+            with open(tabs_file, "r", encoding="utf-8") as f:
+                tabs_dict = json.load(f)
+        except Exception as e:
+            print(f"Could not read tabs for {account_name}:", e)
+
+    for fname in os.listdir(adir):
+        if not fname.endswith(".json") or fname == "__tabs__.json":
+            continue
+        dragon_id = fname[:-5]
+        try:
+            with open(os.path.join(adir, fname), "r", encoding="utf-8") as f:
+                dragon_dict[dragon_id] = migrate_dragon(json.load(f))
+        except Exception as e:
+            print(f"Could not read dragon file {fname}:", e)
+
+    return dragon_dict, tabs_dict
+
+
+def _migrate_from_legacy():
+    """If the old monolithic dragons_data.json exists and the new data/
+    directory doesn't, convert everything across and rename the old file."""
+    if not os.path.exists(DATA_FILE):
+        return
+    if os.path.exists(DATA_DIR):
+        return
+
+    print("[data] Migrating from dragons_data.json to per-dragon files…")
+    try:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            raw = json.load(f)
+    except Exception as e:
+        print("[data] Could not read legacy file:", e)
+        return
+
     if not raw:
-        return False
+        return
+
     first_value = next(iter(raw.values()))
-    return isinstance(first_value, dict) and "Nickname" in first_value
+    if isinstance(first_value, dict) and "Nickname" in first_value:
+        raw = {"Player1": raw}
+
+    for acc, roster in raw.items():
+        if acc in LEGACY_EXAMPLE_ACCOUNTS:
+            continue
+        tabs = roster.pop(TABS_KEY, {})
+        dragons_in_acc = {k: migrate_dragon(v) for k, v in roster.items()}
+        _write_account(acc, dragons_in_acc, tabs)
+
+    try:
+        os.rename(DATA_FILE, DATA_FILE + ".migrated")
+        print("[data] Migration complete. Old file renamed to dragons_data.json.migrated")
+    except Exception:
+        pass
 
 
 def load_all_accounts():
-    raw = None
-    if os.path.exists(DATA_FILE):
-        try:
-            with open(DATA_FILE, "r", encoding="utf-8") as f:
-                raw = json.load(f)
-        except Exception as e:
-            print("Could not read dragons_data.json, falling back to defaults:", e)
+    _migrate_from_legacy()
 
-    if raw is None:
-        data = {}
-    elif _is_old_flat_save(raw):
-        data = {"Player1": {k: migrate_dragon(v) for k, v in raw.items()}}
-    else:
-        data = {}
-        for acc, roster in raw.items():
-            migrated = {}
-            for k, v in roster.items():
-                if k == TABS_KEY:
-                    migrated[TABS_KEY] = v
-                else:
-                    migrated[k] = migrate_dragon(v)
-            data[acc] = migrated
+    data = {}
+    if os.path.isdir(DATA_DIR):
+        for account_name in os.listdir(DATA_DIR):
+            if not os.path.isdir(_account_dir(account_name)):
+                continue
+            if account_name in LEGACY_EXAMPLE_ACCOUNTS:
+                continue
+            dragon_dict, tabs_dict = _read_account(account_name)
+            data[account_name] = {**dragon_dict, TABS_KEY: tabs_dict}
 
-    for legacy_account in LEGACY_EXAMPLE_ACCOUNTS:
-        data.pop(legacy_account, None)
-
-    save_all_accounts(data)
     return data
+
+
+def save_all_accounts(data):
+    for acc, roster in data.items():
+        tabs = roster.get(TABS_KEY, {})
+        dragons_in_acc = {k: v for k, v in roster.items() if k != TABS_KEY}
+        _write_account(acc, dragons_in_acc, tabs)
 
 
 all_accounts_data = load_all_accounts()
@@ -1231,7 +1275,7 @@ def persist():
     for k in list(account_slot.keys()):
         if k != TABS_KEY and k not in dragons:
             del account_slot[k]
-    save_all_accounts(all_accounts_data)
+    _write_account(current_account, dragons, current_tabs)
 
 
 def create_tab(name):
@@ -1265,10 +1309,6 @@ def remove_dragon_from_tab(tab_id, dragon_id):
 
 
 def move_dragon_to_account(dragon_id, dest_account):
-    """Moves a dragon record from the current account into dest_account's
-    roster. Drops it from any tabs in the source account (tabs are
-    per-account, so membership there wouldn't carry meaning at the
-    destination). Re-IDs on the rare chance of a dragon_id collision."""
     if dragon_id not in dragons or dest_account == current_account:
         return False
 
@@ -1288,6 +1328,10 @@ def move_dragon_to_account(dragon_id, dest_account):
     dest_slot[new_id] = record
 
     persist()
+
+    dest_dragons = {k: v for k, v in dest_slot.items() if k != TABS_KEY}
+    _write_account(dest_account, dest_dragons, dest_slot.get(TABS_KEY, {}))
+
     return True
 
 
@@ -3123,7 +3167,10 @@ def open_dragon_form(parent_win, refresh_callback, dragon_id=None):
 
         new_id = dragon_id if editing else uuid.uuid4().hex[:10]
         gen_text = generation_var.get().strip()
-        generation = int(gen_text) if gen_text.isdigit() else (gen_text or "-")
+        if gen_text.lstrip("-").isdigit():
+            generation = max(1, int(gen_text))
+        else:
+            generation = gen_text or "-"
         try:
             level = max(1, min(50, int(level_var.get())))
         except (TypeError, ValueError, tk.TclError):
@@ -3265,7 +3312,10 @@ def start():
                     if messagebox.askyesno("Delete account",
                                             f'Delete "{u}" and all its dragons? This can\'t be undone.'):
                         all_accounts_data.pop(u, None)
-                        save_all_accounts(all_accounts_data)
+                        try:
+                            shutil.rmtree(_account_dir(u), ignore_errors=True)
+                        except Exception:
+                            pass
                         render_accounts()
                 return _delete
 
